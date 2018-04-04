@@ -24,6 +24,8 @@ import {
 // STEP SCREEN 
 import SplashStep1 from './src/step/step1'
 
+import HomeApp from './src/home/home'
+
 class App extends Component {
     constructor() {
       super()
@@ -96,9 +98,12 @@ const Routring = StackNavigator({
   },
   SplashStep1 : {
     screen : SplashStep1
+  },
+  HomeApp : {
+    screen : HomeApp
   }
 }, {
-  initialRouteName : 'SplashStep1',
+  initialRouteName : 'HomeApp',
   headerMode : 'none'
 })
 

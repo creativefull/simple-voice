@@ -129,30 +129,8 @@ export default class Step1 extends Component {
   }
 
   pindahMenu() {
-	this.setState({
-		selesai : true
-	}, () => {
-		Animated.sequence([
-			Animated.timing(this.state.scaleBackground.top, {
-				toValue : 0,
-				duration : 1200
-			}),
-			Animated.timing(this.state.scaleBackground.left, {
-				toValue : 0,
-				duration : 200000
-			}),
-			Animated.timing(this.state.scaleBackground.bottom, {
-				toValue : 0,
-				duration : 200000
-			}),
-			Animated.timing(this.state.scaleBackground.right, {
-				toValue : 0,
-				duration : 200000
-			})
-		], {
-			duration : 40000
-		}).start()
-	})
+	const {navigate} = this.props.navigation
+	navigate('HomeApp')
   }
 
   successTest() {
@@ -196,10 +174,6 @@ export default class Step1 extends Component {
 				<Text style={{color : '#FFF'}}>LANGKAH SELANJUTNYA</Text>
 			</Button>
 		</Animated.View>
-
-		{
-			this.state.selesai == true && <Animated.View style={{zIndex : 9, position : 'absolute', backgroundColor : '#FFF', ...this.state.scaleBackground}}></Animated.View>
-		}
       </Container>
     )
   }

@@ -94,8 +94,8 @@ def enableSeparateBuildPerCPUArchitecture = false
 def enableProguardInReleaseBuilds = false
 
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.1"
+    compileSdkVersion 27
+    buildToolsVersion "27.0.3"
 
     defaultConfig {
         applicationId "com.menemubaling"
@@ -137,6 +137,7 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-webview-bridge')
     compile project(':react-native-voice')
     compile project(':react-native-check-app-install')
     compile fileTree(dir: "libs", include: ["*.jar"])
