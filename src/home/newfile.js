@@ -20,11 +20,13 @@ import {
 import getTheme from '../../native-base-theme/components/'
 import material from '../../native-base-theme/variables/commonColor'
 import Voice from 'react-native-voice';
+const RNFS = require('react-native-fs');
 
 import {
 	StyleSheet,
 	Animated,
-	Keyboard
+	Keyboard,
+	AsyncStorage
 } from 'react-native'
 
 class HeaderApp extends Component {
@@ -43,8 +45,8 @@ class HeaderApp extends Component {
 					<Button transparent>
 						<Icon name='md-volume-up' type="Ionicons" />
 					</Button>
-					<Button transparent>
-						<Icon name='more-horiz' type="MaterialIcons" />
+					<Button transparent onPress={this.props.actionSave.bind()}>
+						<Icon name='save' type="MaterialIcons" />
 					</Button>
 				</Right>
 			</Header>
@@ -82,6 +84,61 @@ class NewFile extends Component {
 		})
 		await Voice.stop()
 		Voice.destroy()
+	}
+
+	isExistNotes() {
+		return new Promise((resolve, reject) => {
+			RNFS.exists(RNFS.DocumentDirectoryPath + '/notes').then((result) => {
+				return resolve(result)
+			}).catch((e) => {
+				return reject(e)
+			})
+		})
+	}	
+
+	readDir() {
+		this.isExistNotes().then((isExist) => {
+			RNFS.mkdir(RNFS.DocumentDirectoryPath + '/notes').then((result) => {
+				RNFS.readDir(RNFS.DocumentDirectoryPath + '/notes').then((result) => {
+					alert(JSON.stringify(result))
+				}).catch((e) => {
+					console.log(e)
+				})
+			})
+		})
+	}
+
+	writeFile(title, content) {
+		return new Promise((resolve, reject) => {
+			RNFS.writeFile(RNFS.DocumentDirectoryPath + '/notes/' + title, content, 'utf8').then((result) => {
+				return resolve(true)
+			}).catch((e) => {
+				return reject(e)
+			})
+		})
+	}
+
+	saveFile() {
+		let title = new Date().getTime()
+
+		AsyncStorage.getItem('notes', (err, notes) => {
+			if (err) {
+				alert('Smartphone anda tidak support penyimpanan local')
+			}
+		})
+
+		// writeFile(title + '.txt', this.richtext.getContentHtml()).then(() => {
+		// 	alert('Berhasil Tersimpan')
+		// }).catch((e) => {
+		// 	alert('Terjadi Error')
+		// })
+	}
+
+	componentDidMount() {
+		const {params} = this.props.navigation.state
+		this.setState({
+			theTitle : params.title
+		})
 	}
 
 	_keyboardDidShow () {
@@ -137,17 +194,16 @@ class NewFile extends Component {
 		this.setState({
 			textPartial : e.value[0]
 		})
-
-		// this.richtext.setContentHTML(this.state.initContent + ' ' + this.state.textPartial)
+		this.richtext.setContentHTML(this.state.initContent + ' ' + this.state.textPartial)
 	}
 
 	componentWillMount() {
-		setInterval(async () => {
-			let title = await this.richtext.getTitleText()
-			this.setState({
-				theTitle : title
-			})
-		}, 1000)
+		// setInterval(async () => {
+		// 	let title = await this.richtext.getTitleText()
+		// 	this.setState({
+		// 		theTitle : title
+		// 	})
+		// }, 5000)
 	}
 
 	async onSpeechResultsHandler(e) {
@@ -159,15 +215,12 @@ class NewFile extends Component {
 			textPartial : '',
 			initContent : content
 		}, () => {
-			this.setState({
-				initContent : content
-			})
 		})
 		// alert(JSON.stringify(e))
 	}
 
 	initCallBackEditor() {
-		this.richtext.setBackgroundColor('#F80')
+		// this.richtext.setBackgroundColor('#F80')
 	}
 
 	async startVoice() {
@@ -189,7 +242,10 @@ class NewFile extends Component {
 		return (
 			<StyleProvider style={getTheme(material)}>
 				<Container>
-					<HeaderApp ref={ref => this.headerTitle = ref} title={this.state.theTitle} {...this.props}/>
+					<HeaderApp
+						actionSave={this.saveFile.bind(this)}
+						ref={ref => this.headerTitle = ref}
+						title={this.state.theTitle} {...this.props}/>
 
 					<RichTextEditor
 						ref={(r)=>this.richtext = r}
@@ -207,9 +263,6 @@ class NewFile extends Component {
 					<Animated.View style={{opacity : this.state.opacityVoice, height : this.state.heightVoice}}>
 						<Footer style={{height : 100}}>
 							<FooterTab style={{padding : 20, backgroundColor : '#2980B9'}}>
-								<Text>
-									{this.state.textPartial}
-								</Text>
 								<Button full style={{padding : 40}} transparent onPress={this.startVoice.bind(this)}>
 									<Icon name={this.state.startedVoice == false ? "keyboard-voice" : "settings-voice"} type="MaterialIcons" style={{fontSize : 50, color : '#FFF', margin : 40}}/>
 								</Button>
