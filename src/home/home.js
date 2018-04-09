@@ -23,7 +23,8 @@ import {
 } from 'react-navigation'
 
 import {
-	ScrollView
+	ScrollView,
+	TouchableOpacity
 } from 'react-native'
 
 import NewDoc from './newfile'
@@ -54,7 +55,7 @@ class Home extends Component {
 				title : 'Get Started',
 				content : 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.'
 			},{
-				title : 'Get Started',
+				title : 'Hello World',
 				content : 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.'
 			}]
 		}
@@ -71,35 +72,41 @@ class Home extends Component {
 		return (
 			this.state.data.map((d, key) => {
 				return (
-					<Card key={key}>
-						<CardItem>
-							<Left>
-								<Icon name='docs' type="SimpleLineIcons"/>
+					<TouchableOpacity
+						onPress={() => {
+							this.props.navigation.navigate('NewDoc', {title : d.title, id : 1})
+						}}
+						key={key}>
+						<Card key={key}>
+							<CardItem>
+								<Left>
+									<Icon name='docs' type="SimpleLineIcons"/>
+									<Body>
+										<Text>{d.title}</Text>
+										<Text note>April 25, 2018</Text>
+									</Body>
+								</Left>
+							</CardItem>
+							<CardItem>
 								<Body>
-									<Text>{d.title}</Text>
-									<Text note>April 25, 2018</Text>
+									<Text style={{fontSize : 11}} numberOfLines={4}>{d.content}</Text>
 								</Body>
-							</Left>
-						</CardItem>
-						<CardItem>
-							<Body>
-								<Text style={{fontSize : 11}} numberOfLines={4}>{d.content}</Text>
-							</Body>
-						</CardItem>
-						<CardItem>
-							<Left>
-								<Button transparent textStyle={{color : '#87838B'}}>
-									<Icon name="share"/>
-								</Button>
-								<Button transparent textStyle={{color : '#87838B'}}>
-									<Icon name="page-export" type="Foundation"/>
-								</Button>
-								<Button transparent textStyle={{color : '#87838B'}}>
-									<Icon name="trash"/>
-								</Button>
-							</Left>
-						</CardItem>
-					</Card>
+							</CardItem>
+							<CardItem>
+								<Left>
+									<Button transparent textStyle={{color : '#87838B'}}>
+										<Icon name="share"/>
+									</Button>
+									<Button transparent textStyle={{color : '#87838B'}}>
+										<Icon name="page-export" type="Foundation"/>
+									</Button>
+									<Button transparent textStyle={{color : '#87838B'}}>
+										<Icon name="trash"/>
+									</Button>
+								</Left>
+							</CardItem>
+						</Card>
+					</TouchableOpacity>
 				)
 			})
 		)
@@ -129,7 +136,7 @@ const Nav = StackNavigator({
 		screen : NewDoc
 	}
 }, {
-	initialRouteName : 'NewDoc',
+	initialRouteName : 'Home',
 	headerMode : 'none'
 })
 

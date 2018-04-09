@@ -8,9 +8,13 @@
   },
   "dependencies": {
     "native-base": "^2.4.1",
+    "prop-types": "^15.6.1",
     "react": "16.3.0",
     "react-native": "0.54.4",
+    "react-native-autogrow-textinput": "^5.1.1",
+    "react-native-blur": "^3.2.2",
     "react-native-check-app-install": "0.0.4",
+    "react-native-fs": "^2.9.11",
     "react-native-keyboard-input": "^5.2.0",
     "react-native-voice": "^0.2.6",
     "react-native-webview-bridge": "^0.33.0",
