@@ -21,12 +21,14 @@ import getTheme from '../../native-base-theme/components/'
 import material from '../../native-base-theme/variables/commonColor'
 import Voice from 'react-native-voice';
 const RNFS = require('react-native-fs');
+const _ = require('underscore')
 
 import {
 	StyleSheet,
 	Animated,
 	Keyboard,
-	AsyncStorage
+	AsyncStorage,
+	ToastAndroid
 } from 'react-native'
 
 class HeaderApp extends Component {
@@ -119,26 +121,101 @@ class NewFile extends Component {
 	}
 
 	saveFile() {
-		let title = new Date().getTime()
+		const {params} = this.props.navigation.state
+		let title = params ? params.id != undefined ? params.id : new Date().getTime() : new Date().getTime()
 
-		AsyncStorage.getItem('notes', (err, notes) => {
+		AsyncStorage.getItem('notes', async (err, notes) => {
 			if (err) {
 				alert('Smartphone anda tidak support penyimpanan local')
 			}
-		})
 
-		// writeFile(title + '.txt', this.richtext.getContentHtml()).then(() => {
-		// 	alert('Berhasil Tersimpan')
-		// }).catch((e) => {
-		// 	alert('Terjadi Error')
-		// })
+			notes = JSON.parse(notes)
+			let whereID = _.findWhere(notes, {id : title})
+			// IF DOCUMENT ALREADY EXISTS
+			if (whereID) {
+				let content = await this.richtext.getContentHtml()
+				this.writeFile(whereID.id + '.txt', content).then(async (result) => {
+					if (result) {
+						let theTitle = await this.richtext.getTitleText()
+						notes.map((value) => {
+							if (whereID.id == value.id) {
+								value.title = theTitle
+								value.time_update = new Date().getTime()
+							}
+						})
+
+						AsyncStorage.setItem('notes', JSON.stringify(notes), (err, res) => {
+							if (err) {
+								return alert('Tidak dapat menyimpan document')
+							}
+							
+							ToastAndroid.show('Berhasil Menyimpan Document ' + whereID.title, ToastAndroid.LONG)
+							this.props.navigation.navigate('Home')
+						})
+					} else {
+						ToastAndroid.show('Tidak dapat menyimpan document', ToastAndroid.CENTER)
+					}
+				})
+			} else {
+				let dataToSave = {
+					id : title,
+					title : await this.richtext.getTitleText(),
+					file : title + '.txt',
+					created_at : new Date().getTime(),
+					time_update : new Date().getTime()
+				}
+				let content = await this.richtext.getContentHtml()
+				this.writeFile(dataToSave.file, content).then((result) => {
+					if (result) {
+						let data = []
+						data.push(dataToSave)
+
+						AsyncStorage.setItem('notes', JSON.stringify(data), (err, result) => {
+							if (err) {
+								return alert('Tidak dapat menyimpan document')
+							}
+							
+							ToastAndroid.show('Berhasil Menyimpan Document ' + dataToSave.title, ToastAndroid.LONG)
+							this.props.navigation.navigate('Home')
+						})
+					} else {
+						alert('Gagal untuk menyimpan document')
+					}
+				})
+			}
+		})
+	}
+
+	getFileContent(file) {
+		// alert(RNFS.DocumentDirectoryPath + '/notes/' + file)
+		RNFS.exists(RNFS.DocumentDirectoryPath + '/notes/' + file).then((onoFile) => {
+			// alert(onoFile)
+			if (onoFile) {
+				RNFS.readFile(RNFS.DocumentDirectoryPath + '/notes/' + file).then((contentFile) => {
+					// alert(contentFile)
+					this.setState({
+						initContent : contentFile
+					})
+				}).catch((e) => {
+					ToastAndroid.show('Tidak dapat membuka content')
+				})
+			} else {
+				ToastAndroid.show('CONTENT NOT FOUND', ToastAndroid.LONG)
+			}
+		})
 	}
 
 	componentDidMount() {
 		const {params} = this.props.navigation.state
 		this.setState({
-			theTitle : params.title
+			theTitle : params ? params.title : 'Judul Document'
 		})
+
+		if (params) {
+			this.getFileContent(params.file)
+		}
+
+		// this.readDir()
 	}
 
 	_keyboardDidShow () {
@@ -194,7 +271,8 @@ class NewFile extends Component {
 		this.setState({
 			textPartial : e.value[0]
 		})
-		this.richtext.setContentHTML(this.state.initContent + ' ' + this.state.textPartial)
+		let content = await this.richtext.getContentHtml()
+		this.richtext.setContentHTML( content + ' ' + this.state.textPartial)
 	}
 
 	componentWillMount() {

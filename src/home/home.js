@@ -24,6 +24,7 @@ import {
 
 import {
 	ScrollView,
+	AsyncStorage,
 	TouchableOpacity
 } from 'react-native'
 
@@ -51,13 +52,7 @@ class Home extends Component {
 	constructor() {
 		super()
 		this.state = {
-			data : [{
-				title : 'Get Started',
-				content : 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.'
-			},{
-				title : 'Hello World',
-				content : 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.'
-			}]
+			data : []
 		}
 	}
 
@@ -68,13 +63,29 @@ class Home extends Component {
 			</Button>
 		)
 	}
+	
+	getListDocument() {
+		AsyncStorage.getItem('notes', (err, notes) => {
+			if (err) {
+				alert('Get Document Error')
+			}
+
+			let data = notes ? JSON.parse(notes) : []
+			this.setState({ data })
+		})
+	}
+
+	componentDidMount() {
+		this.getListDocument()
+	}
+
 	renderNotes() {
 		return (
 			this.state.data.map((d, key) => {
 				return (
 					<TouchableOpacity
 						onPress={() => {
-							this.props.navigation.navigate('NewDoc', {title : d.title, id : 1})
+							this.props.navigation.navigate('NewDoc', {title : d.title, id : d.id, file : d.file})
 						}}
 						key={key}>
 						<Card key={key}>
@@ -82,16 +93,16 @@ class Home extends Component {
 								<Left>
 									<Icon name='docs' type="SimpleLineIcons"/>
 									<Body>
-										<Text>{d.title}</Text>
+										<Text>{d.title.toUpperCase()}</Text>
 										<Text note>April 25, 2018</Text>
 									</Body>
 								</Left>
 							</CardItem>
-							<CardItem>
+							{/* <CardItem>
 								<Body>
 									<Text style={{fontSize : 11}} numberOfLines={4}>{d.content}</Text>
 								</Body>
-							</CardItem>
+							</CardItem> */}
 							<CardItem>
 								<Left>
 									<Button transparent textStyle={{color : '#87838B'}}>
