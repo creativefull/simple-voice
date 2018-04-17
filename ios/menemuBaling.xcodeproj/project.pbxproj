@@ -52,6 +52,12 @@
 		3F6E3A25260B41A1AEEE9122 /* libReact-Native-Webview-Bridge.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 99A2C01785A44BAFA5FCE998 /* libReact-Native-Webview-Bridge.a */; };
 		566E37BE581C4FDAB6035E93 /* libRCTCustomInputController.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D83B5BB0A89849AF856D20E9 /* libRCTCustomInputController.a */; };
 		31FB84CEF430428999BEC0F4 /* libRNFS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7162C8840FFE4AC78AE579A1 /* libRNFS.a */; };
+		75E6A52C0AF0482A9E7A869F /* libAutoGrowTextInput.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FF25E6B281BE4F738817100B /* libAutoGrowTextInput.a */; };
+		94D6600456FE459D99BB4498 /* libRNBlur.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 41160607A231424195383AE8 /* libRNBlur.a */; };
+		43EFFEDDF542461DB3593E29 /* libTextToSpeech.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DC4EAD27CF6D4FCAB480B33D /* libTextToSpeech.a */; };
+		4ADE396EC31D41DF8669C419 /* libRNShare.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 438C0E58DA1F4415A22F4261 /* libRNShare.a */; };
+		0569FDC366364196BCD0976C /* libRNFetchBlob.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 31EB2BFC66FC465B997EFF65 /* libRNFetchBlob.a */; };
+		74C898EAEB1A4A63A0C82B1C /* libRNSettings.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C25132E9D41F47C19522FE97 /* libRNSettings.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -321,6 +327,18 @@
 		D83B5BB0A89849AF856D20E9 /* libRCTCustomInputController.a */ = {isa = PBXFileReference; name = "libRCTCustomInputController.a"; path = "libRCTCustomInputController.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 		777E5FE0755F464EB13AB93F /* RNFS.xcodeproj */ = {isa = PBXFileReference; name = "RNFS.xcodeproj"; path = "../node_modules/react-native-fs/RNFS.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
 		7162C8840FFE4AC78AE579A1 /* libRNFS.a */ = {isa = PBXFileReference; name = "libRNFS.a"; path = "libRNFS.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		B6CE1369F5264516AB10D560 /* AutoGrowTextInput.xcodeproj */ = {isa = PBXFileReference; name = "AutoGrowTextInput.xcodeproj"; path = "../node_modules/react-native-autogrow-textinput/ios/AutoGrowTextInput.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		FF25E6B281BE4F738817100B /* libAutoGrowTextInput.a */ = {isa = PBXFileReference; name = "libAutoGrowTextInput.a"; path = "libAutoGrowTextInput.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		5FC75459C115470DB5ED3B68 /* RNBlur.xcodeproj */ = {isa = PBXFileReference; name = "RNBlur.xcodeproj"; path = "../node_modules/react-native-blur/ios/RNBlur.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		41160607A231424195383AE8 /* libRNBlur.a */ = {isa = PBXFileReference; name = "libRNBlur.a"; path = "libRNBlur.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		5EF108AB2EEF4B7CBC6818B3 /* TextToSpeech.xcodeproj */ = {isa = PBXFileReference; name = "TextToSpeech.xcodeproj"; path = "../node_modules/react-native-tts/ios/TextToSpeech.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		DC4EAD27CF6D4FCAB480B33D /* libTextToSpeech.a */ = {isa = PBXFileReference; name = "libTextToSpeech.a"; path = "libTextToSpeech.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		40A411711C2D4E8294518E0B /* RNShare.xcodeproj */ = {isa = PBXFileReference; name = "RNShare.xcodeproj"; path = "../node_modules/react-native-share/ios/RNShare.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		438C0E58DA1F4415A22F4261 /* libRNShare.a */ = {isa = PBXFileReference; name = "libRNShare.a"; path = "libRNShare.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		F7B3450E7CF0432DA4FC4BEA /* RNFetchBlob.xcodeproj */ = {isa = PBXFileReference; name = "RNFetchBlob.xcodeproj"; path = "../node_modules/react-native-fetch-blob/ios/RNFetchBlob.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		31EB2BFC66FC465B997EFF65 /* libRNFetchBlob.a */ = {isa = PBXFileReference; name = "libRNFetchBlob.a"; path = "libRNFetchBlob.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		40E79F66B05345D59B7A86F4 /* RNSettings.xcodeproj */ = {isa = PBXFileReference; name = "RNSettings.xcodeproj"; path = "../node_modules/react-native-settings/ios/RNSettings.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		C25132E9D41F47C19522FE97 /* libRNSettings.a */ = {isa = PBXFileReference; name = "libRNSettings.a"; path = "libRNSettings.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -353,6 +371,12 @@
 				3F6E3A25260B41A1AEEE9122 /* libReact-Native-Webview-Bridge.a in Frameworks */,
 				566E37BE581C4FDAB6035E93 /* libRCTCustomInputController.a in Frameworks */,
 				31FB84CEF430428999BEC0F4 /* libRNFS.a in Frameworks */,
+				75E6A52C0AF0482A9E7A869F /* libAutoGrowTextInput.a in Frameworks */,
+				94D6600456FE459D99BB4498 /* libRNBlur.a in Frameworks */,
+				43EFFEDDF542461DB3593E29 /* libTextToSpeech.a in Frameworks */,
+				4ADE396EC31D41DF8669C419 /* libRNShare.a in Frameworks */,
+				0569FDC366364196BCD0976C /* libRNFetchBlob.a in Frameworks */,
+				74C898EAEB1A4A63A0C82B1C /* libRNSettings.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -536,6 +560,12 @@
 				0E5ABF45CCA0475089DEDCED /* React-Native-Webview-Bridge.xcodeproj */,
 				5432A07E782B4A0AA796EDD9 /* RCTCustomInputController.xcodeproj */,
 				777E5FE0755F464EB13AB93F /* RNFS.xcodeproj */,
+				B6CE1369F5264516AB10D560 /* AutoGrowTextInput.xcodeproj */,
+				5FC75459C115470DB5ED3B68 /* RNBlur.xcodeproj */,
+				5EF108AB2EEF4B7CBC6818B3 /* TextToSpeech.xcodeproj */,
+				40A411711C2D4E8294518E0B /* RNShare.xcodeproj */,
+				F7B3450E7CF0432DA4FC4BEA /* RNFetchBlob.xcodeproj */,
+				40E79F66B05345D59B7A86F4 /* RNSettings.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -1148,6 +1178,12 @@
 					"$(SRCROOT)/../node_modules/react-native-webview-bridge/ios",
 					"$(SRCROOT)/../node_modules/react-native-keyboard-input/lib/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
+					"$(SRCROOT)/../node_modules/react-native-autogrow-textinput/ios",
+					"$(SRCROOT)/../node_modules/react-native-blur/ios",
+					"$(SRCROOT)/../node_modules/react-native-tts/ios/TextToSpeech",
+					"$(SRCROOT)/../node_modules/react-native-share/ios",
+					"$(SRCROOT)/../node_modules/react-native-fetch-blob/ios/**",
+					"$(SRCROOT)/../node_modules/react-native-settings/ios",
 				);
 			};
 			name = Debug;
@@ -1177,6 +1213,12 @@
 					"$(SRCROOT)/../node_modules/react-native-webview-bridge/ios",
 					"$(SRCROOT)/../node_modules/react-native-keyboard-input/lib/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
+					"$(SRCROOT)/../node_modules/react-native-autogrow-textinput/ios",
+					"$(SRCROOT)/../node_modules/react-native-blur/ios",
+					"$(SRCROOT)/../node_modules/react-native-tts/ios/TextToSpeech",
+					"$(SRCROOT)/../node_modules/react-native-share/ios",
+					"$(SRCROOT)/../node_modules/react-native-fetch-blob/ios/**",
+					"$(SRCROOT)/../node_modules/react-native-settings/ios",
 				);
 			};
 			name = Release;
@@ -1202,6 +1244,12 @@
 					"$(SRCROOT)/../node_modules/react-native-webview-bridge/ios",
 					"$(SRCROOT)/../node_modules/react-native-keyboard-input/lib/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
+					"$(SRCROOT)/../node_modules/react-native-autogrow-textinput/ios",
+					"$(SRCROOT)/../node_modules/react-native-blur/ios",
+					"$(SRCROOT)/../node_modules/react-native-tts/ios/TextToSpeech",
+					"$(SRCROOT)/../node_modules/react-native-share/ios",
+					"$(SRCROOT)/../node_modules/react-native-fetch-blob/ios/**",
+					"$(SRCROOT)/../node_modules/react-native-settings/ios",
 				);
 			};
 			name = Debug;
@@ -1226,6 +1274,12 @@
 					"$(SRCROOT)/../node_modules/react-native-webview-bridge/ios",
 					"$(SRCROOT)/../node_modules/react-native-keyboard-input/lib/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
+					"$(SRCROOT)/../node_modules/react-native-autogrow-textinput/ios",
+					"$(SRCROOT)/../node_modules/react-native-blur/ios",
+					"$(SRCROOT)/../node_modules/react-native-tts/ios/TextToSpeech",
+					"$(SRCROOT)/../node_modules/react-native-share/ios",
+					"$(SRCROOT)/../node_modules/react-native-fetch-blob/ios/**",
+					"$(SRCROOT)/../node_modules/react-native-settings/ios",
 				);
 			};
 			name = Release;
@@ -1264,6 +1318,12 @@
 					"$(SRCROOT)/../node_modules/react-native-webview-bridge/ios",
 					"$(SRCROOT)/../node_modules/react-native-keyboard-input/lib/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
+					"$(SRCROOT)/../node_modules/react-native-autogrow-textinput/ios",
+					"$(SRCROOT)/../node_modules/react-native-blur/ios",
+					"$(SRCROOT)/../node_modules/react-native-tts/ios/TextToSpeech",
+					"$(SRCROOT)/../node_modules/react-native-share/ios",
+					"$(SRCROOT)/../node_modules/react-native-fetch-blob/ios/**",
+					"$(SRCROOT)/../node_modules/react-native-settings/ios",
 				);
 			};
 			name = Debug;
@@ -1302,6 +1362,12 @@
 					"$(SRCROOT)/../node_modules/react-native-webview-bridge/ios",
 					"$(SRCROOT)/../node_modules/react-native-keyboard-input/lib/ios/**",
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
+					"$(SRCROOT)/../node_modules/react-native-autogrow-textinput/ios",
+					"$(SRCROOT)/../node_modules/react-native-blur/ios",
+					"$(SRCROOT)/../node_modules/react-native-tts/ios/TextToSpeech",
+					"$(SRCROOT)/../node_modules/react-native-share/ios",
+					"$(SRCROOT)/../node_modules/react-native-fetch-blob/ios/**",
+					"$(SRCROOT)/../node_modules/react-native-settings/ios",
 				);
 			};
 			name = Release;

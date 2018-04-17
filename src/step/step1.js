@@ -8,7 +8,8 @@ import React, { Component } from 'react';
 import {
   Animated,
   StyleSheet,
-  Easing,
+	Easing,
+	AsyncStorage,
   TouchableOpacity
 } from 'react-native'
 import {
@@ -129,8 +130,14 @@ export default class Step1 extends Component {
   }
 
   pindahMenu() {
-	const {navigate} = this.props.navigation
-	navigate('HomeApp')
+		const {navigate} = this.props.navigation
+		AsyncStorage.setItem('setup', 'true', (err) => {
+			if (!err) {
+				navigate('HomeApp')
+			} else {
+				alert('Terjadi Kesalahan')
+			}
+		})
   }
 
   successTest() {

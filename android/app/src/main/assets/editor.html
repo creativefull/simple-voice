@@ -1362,6 +1362,12 @@
 				zss_editor.enabledEditingItems();
 			}
 
+			zss_editor.insertNextText = function(text) {
+				zss_editor.restorerange();
+				document.execCommand('insertText', true, text)
+				zss_editor.enabledEditingItems();
+			}
+
 			function setHTML(editorId, html) {
 				var editor = $('#' + editorId);
 				editor.html(html);

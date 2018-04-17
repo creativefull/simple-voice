@@ -7,6 +7,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "html-docx-js": "^0.3.1",
     "moment": "^2.22.0",
     "native-base": "^2.4.1",
     "prop-types": "^15.6.1",
@@ -17,6 +18,10 @@
     "react-native-check-app-install": "0.0.4",
     "react-native-fs": "^2.9.11",
     "react-native-keyboard-input": "^5.2.0",
+    "react-native-settings": "0.0.1-alpha5",
+    "react-native-share": "^1.0.27",
+    "react-native-tts": "^1.5.0",
+    "react-native-ui-kitten": "^3.0.0",
     "react-native-voice": "^0.2.6",
     "react-native-webview-bridge": "^0.33.0",
     "react-native-zss-rich-text-editor": "^1.1.0",

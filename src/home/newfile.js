@@ -22,6 +22,7 @@ import material from '../../native-base-theme/variables/commonColor'
 import Voice from 'react-native-voice';
 const RNFS = require('react-native-fs');
 const _ = require('underscore')
+import {speak, lang, tts} from '../services/speak'
 
 import {
 	StyleSheet,
@@ -44,8 +45,8 @@ class HeaderApp extends Component {
 					<Title>{this.props.title || 'Menemu Baling'}</Title>
 				</Body>
 				<Right>
-					<Button transparent>
-						<Icon name='md-volume-up' type="Ionicons" />
+					<Button transparent onPress={this.props.actionSpeak.bind()}>
+						<Icon name={this.props.isSpeak ? 'ios-volume-up' : 'ios-volume-off-outline'} type="Ionicons" />
 					</Button>
 					<Button transparent onPress={this.props.actionSave.bind()}>
 						<Icon name='save' type="MaterialIcons" />
@@ -59,6 +60,10 @@ class HeaderApp extends Component {
 class NewFile extends Component {
 	constructor(props) {
 		super(props)
+		tts.addEventListener('tts-start', this._ttsStart.bind(this))
+		tts.addEventListener('tts-finish', this._ttsFinish.bind(this))
+		tts.addEventListener('tts-cancel', this._ttsCancel.bind(this))
+
 		this.state = {
 			opacityVoice : new Animated.Value(1),
 			heightVoice : new Animated.Value(100),
@@ -66,7 +71,9 @@ class NewFile extends Component {
 			textPartial : '',
 			textRecog : '',
 			theTitle : '',
-			initContent : ''
+			initContent : '',
+			focusInput : 'content',
+			speaking : false
 		}
 		this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this._keyboardDidShow.bind(this));
 		this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this._keyboardDidHide.bind(this));
@@ -76,6 +83,37 @@ class NewFile extends Component {
 		Voice.onSpeechEnd = this.onSpeechEndHandler.bind(this);
 		Voice.onSpeechResults = this.onSpeechResultsHandler.bind(this);
 		Voice.onSpeechPartialResults = this.onSpeechPartialResults.bind(this)
+		Voice.onSpeechRecognized = this.onSpeechRecognized.bind(this)
+	}
+
+	// TEXT TO SPEACH EVENT
+	_ttsStart(e) {
+		this.setState({
+			speaking : true
+		})
+		ToastAndroid.show('Memulai Membaca Document', ToastAndroid.CENTER)
+	}
+	_ttsFinish(e) {
+		this.setState({
+			speaking : false
+		})
+		ToastAndroid.show('Selesai Membaca Document', ToastAndroid.CENTER)
+	}
+	_ttsCancel(e) {
+		this.setState({
+			speaking : false
+		})
+		ToastAndroid.show('Membaca Document Dibatalkan', ToastAndroid.CENTER)		
+	}
+	async speakNow() {
+		if (this.state.speaking) {
+			tts.stop()
+		} else {
+			lang()
+			let regex = /(<([^>]+)>)/ig
+			let content = await this.richtext.getContentHtml()
+			speak(content.toString().replace(regex, ''))
+		}
 	}
 
 	async componentWillUnmount () {
@@ -102,7 +140,8 @@ class NewFile extends Component {
 		this.isExistNotes().then((isExist) => {
 			RNFS.mkdir(RNFS.DocumentDirectoryPath + '/notes').then((result) => {
 				RNFS.readDir(RNFS.DocumentDirectoryPath + '/notes').then((result) => {
-					alert(JSON.stringify(result))
+					// alert(JSON.stringify(result))
+					console.log('OK')
 				}).catch((e) => {
 					console.log(e)
 				})
@@ -167,7 +206,7 @@ class NewFile extends Component {
 				let content = await this.richtext.getContentHtml()
 				this.writeFile(dataToSave.file, content).then((result) => {
 					if (result) {
-						let data = []
+						let data = notes ? notes : []
 						data.push(dataToSave)
 
 						AsyncStorage.setItem('notes', JSON.stringify(data), (err, result) => {
@@ -215,7 +254,7 @@ class NewFile extends Component {
 			this.getFileContent(params.file)
 		}
 
-		// this.readDir()
+		this.readDir()
 	}
 
 	_keyboardDidShow () {
@@ -244,16 +283,25 @@ class NewFile extends Component {
 		]).start()
 	}
 
-	onSpeechStart(e) {
+	async onSpeechStart(e) {
+		let content = ''
+		let titleContent = ''
+
+		content = await this.richtext.getContentHtml()
+		titleContent = await this.richtext.getTitleText()
+
 		this.setState({
-			startedVoice : true
+			startedVoice : true,
+			initContent : content,
+			theTitle : titleContent,
+			textPartial : ' '
 		})
 	}
 
 	async onSpeechEndHandler(e) {
 		this.setState({
 			startedVoice : false,
-			textPartial : ''
+			textPartial : ' '
 		})
 
 		// this.richtext.setContentHTML('ok ok ok')
@@ -268,29 +316,54 @@ class NewFile extends Component {
 	}
 
 	async onSpeechPartialResults(e) {
+		var x = this.state.textPartial
 		this.setState({
-			textPartial : e.value[0]
+			textPartial : e.value[0],
 		})
-		let content = await this.richtext.getContentHtml()
-		this.richtext.setContentHTML( content + ' ' + this.state.textPartial)
+		// let content = await this.richtext.getContentHtml()
+		// if (this.state.focusInput == 'content') {
+		// 	this.richtext.setContentHTML( this.state.initContent + ' ' + this.state.textPartial)
+		// } else {
+		// 	this.richtext.setTitleHTML(this.state.theTitle + ' ' + this.state.textPartial)
+		// }
+		let lengthSekarang = e.value[0].split(' ').length
+		let lengthSebelum = x.split(' ').length
+		let resultPart = lengthSebelum < lengthSekarang ? lengthSebelum == 1 ? e.value[0] :  e.value[0].split(' ')[lengthSekarang - 1] : ''
+
+		if (resultPart) {
+			this.richtext.prepareInsert()
+			this.richtext.insertNextText(resultPart + " ")
+		}
 	}
 
-	componentWillMount() {
-		// setInterval(async () => {
-		// 	let title = await this.richtext.getTitleText()
+	setFocusHandlers() {
+		// this.richtext.setTitleFocusHandler(() => {
 		// 	this.setState({
-		// 		theTitle : title
+		// 		focusInput : 'judul'
 		// 	})
-		// }, 5000)
+		// })
+
+		// this.richtext.setContentFocusHandler(() => {
+		// 	this.setState({
+		// 		focusInput : 'content'
+		// 	})
+		// })
+	}
+
+	componentWillUnmount() {
+		Voice.destroy().then(Voice.removeAllListeners);
+	}
+
+	async onSpeechRecognized(e) {
+		// alert(JSON.stringify(e))
 	}
 
 	async onSpeechResultsHandler(e) {
 		let before = this.state.textRecog
-		console.log(e)
 		let content = await this.richtext.getContentHtml()
 		this.setState({
 			textRecog : before + ' ' + e.value[0],
-			textPartial : '',
+			textPartial : ' ',
 			initContent : content
 		}, () => {
 		})
@@ -298,7 +371,7 @@ class NewFile extends Component {
 	}
 
 	initCallBackEditor() {
-		// this.richtext.setBackgroundColor('#F80')
+		this.setFocusHandlers()
 	}
 
 	async startVoice() {
@@ -321,7 +394,9 @@ class NewFile extends Component {
 			<StyleProvider style={getTheme(material)}>
 				<Container>
 					<HeaderApp
+						actionSpeak={this.speakNow.bind(this)}
 						actionSave={this.saveFile.bind(this)}
+						isSpeak={this.state.speaking}
 						ref={ref => this.headerTitle = ref}
 						title={this.state.theTitle} {...this.props}/>
 

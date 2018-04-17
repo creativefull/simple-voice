@@ -3,6 +3,11 @@ package com.menemubaling;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import io.rumors.reactnativesettings.RNSettingsPackage;
+import cl.json.RNSharePackage;
+import net.no_mad.tts.TextToSpeechPackage;
+import com.cmcewen.blurview.BlurViewPackage;
+import com.wix.autogrowtextinput.AutoGrowTextInputPackage;
 import com.rnfs.RNFSPackage;
 import com.github.alinz.reactnativewebviewbridge.WebViewBridgePackage;
 import com.wenkesj.voice.VoicePackage;
@@ -28,6 +33,11 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNSettingsPackage(),
+            new RNSharePackage(),
+            new TextToSpeechPackage(),
+            new BlurViewPackage(),
+            new AutoGrowTextInputPackage(),
             new RNFSPackage(),
             new KeyboardInputPackage(MainApplication.this, true),
             new WebViewBridgePackage(),

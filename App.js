@@ -8,6 +8,7 @@ import React, { Component } from 'react';
 import {
   Animated,
   StyleSheet,
+  AsyncStorage,
   TouchableOpacity
 } from 'react-native'
 import {
@@ -23,6 +24,7 @@ import {
 
 // STEP SCREEN 
 import SplashStep1 from './src/step/step1'
+import Menu from './src/step/menu'
 
 import HomeApp from './src/home/home'
 
@@ -36,7 +38,17 @@ class App extends Component {
       }
     }
 
+    checkSetup() {
+      const {navigate} = this.props.navigation
+      AsyncStorage.getItem('setup', (err, value) => {
+        if (value) {
+          navigate('HomeApp')
+        }
+      })
+    }
+    
     componentDidMount() {
+      this.checkSetup()
       const AnimateButton = Animated.timing(
         this.state.buttonAnim,
         {
@@ -101,9 +113,12 @@ const Routring = StackNavigator({
   },
   HomeApp : {
     screen : HomeApp
+  },
+  Menu : {
+    screen : Menu
   }
 }, {
-  initialRouteName : 'HomeApp',
+  initialRouteName : 'Splash',
   headerMode : 'none'
 })
 
