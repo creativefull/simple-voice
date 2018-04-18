@@ -17,6 +17,7 @@
     "react-native-blur": "^3.2.2",
     "react-native-check-app-install": "0.0.4",
     "react-native-fs": "^2.9.11",
+    "react-native-htmlview": "^0.12.1",
     "react-native-keyboard-input": "^5.2.0",
     "react-native-settings": "0.0.1-alpha5",
     "react-native-share": "^1.0.27",

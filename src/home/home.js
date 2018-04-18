@@ -19,9 +19,11 @@ import getTheme from '../../native-base-theme/components/'
 import material from '../../native-base-theme/variables/commonColor'
 import {downloadText} from '../services/saveas'
 import RNFS from 'react-native-fs'
+const moment = require('moment')
 
 import {
-	StackNavigator
+	StackNavigator,
+	TabNavigator
 } from 'react-navigation'
 
 import {
@@ -29,22 +31,20 @@ import {
 	Share,
 	ToastAndroid,
 	View,
+	Clipboard,
 	Linking,
 	AsyncStorage,
 	TouchableOpacity
 } from 'react-native'
 
 import NewDoc from './newfile'
+import About from './about'
+import Setting from './setting'
 
 class HeaderApp extends Component {
 	render() {
 		return (
-			<Header>
-				<Left>
-					<Button transparent>
-					<Icon name='menu' />
-					</Button>
-				</Left>
+			<Header androidStatusBarColor="#009C41" style={{backgroundColor : '#009C41'}}>
 				<Body>
 					<Title>Menemu Baling</Title>
 				</Body>
@@ -64,7 +64,7 @@ class Home extends Component {
 
 	floatingButton() {
 		return (
-			<Button info style={{zIndex : 9, width : 70, height : 70, borderRadius : 70, justifyContent : 'center', position : 'absolute', bottom : 10, right : 10, alignItems : 'center'}} onPress={() => this.props.navigation.navigate('NewDoc')}>
+			<Button success style={{zIndex : 9, width : 70, height : 70, borderRadius : 70, justifyContent : 'center', position : 'absolute', bottom : 10, right : 10, alignItems : 'center'}} onPress={() => this.props.navigation.navigate('NewDoc')}>
 				<Icon style={{fontSize : 30}} name="plus" type="FontAwesome"/>
 			</Button>
 		)
@@ -81,17 +81,38 @@ class Home extends Component {
 		})
 	}
 
-	componentDidMount() {
-		this.getListDocument()
+	isExistNotes() {
+		return new Promise((resolve, reject) => {
+			RNFS.exists(RNFS.ExternalDirectoryPath + '/notes').then((result) => {
+				return resolve(result)
+			}).catch((e) => {
+				return reject(e)
+			})
+		})
 	}
 
+	generateFolder() {
+		this.isExistNotes().then((isExist) => {
+			RNFS.mkdir(RNFS.ExternalDirectoryPath + '/notes').then((result) => {
+
+			})
+		})
+	}
+	componentDidMount() {
+		this.getListDocument()
+		this.generateFolder()
+	}
+	
 	exportTxt(file, title) {
 		RNFS.readFile(RNFS.DocumentDirectoryPath + '/notes/' + file).then((content) => {
 			// var blob = new Blob([byteNumbers], {type: 'text/html'});
-			let regex = /(<([^>]+)>)/ig
-			htmlString = content.toString().replace(regex, '')
-			RNFS.writeFile(RNFS.ExternalStorageDirectoryPath + '/Documents/' + title + '.docx', htmlString, 'utf8').then((x) => {
-				ToastAndroid.show('File berhasil di export lokasi file: ' + RNFS.ExternalStorageDirectoryPath + '/Documents/' + title + '.docx', ToastAndroid.LONG)
+			// let regex = /(<([^>]+)>)/ig
+			// htmlString = content.toString().replace(regex, '')
+			RNFS.writeFile(RNFS.ExternalDirectoryPath + '/notes/' + file + '.html', content, 'utf8').then((x) => {
+				// ToastAndroid.show('File berhasil di export lokasi file: ' + RNFS.ExternalStorageDirectoryPath + '/Documents/' + title + '.docx', ToastAndroid.LONG)
+				let url = 'file://' + RNFS.ExternalDirectoryPath + '/notes/' + file + '.html#t=1'
+				// Clipboard.setString(url)
+				Linking.openURL('googlechrome://navigate?url=' + url).catch(err => alert(JSON.stringify(err)))
 			})
 		})
 	}
@@ -127,7 +148,7 @@ class Home extends Component {
 										<Icon name='docs' type="SimpleLineIcons"/>
 										<Body>
 											<Text>{d.title.toUpperCase()}</Text>
-											<Text note>April 25, 2018</Text>
+											<Text note>{moment(d.created_at).format('YYYY-MM-DD HH:mm:ss')}</Text>
 										</Body>
 									</Left>
 								</CardItem>
@@ -138,13 +159,13 @@ class Home extends Component {
 								</CardItem> */}
 								<CardItem>
 									<Left>
-										<Button transparent textStyle={{color : '#87838B'}} onPress={() => this.share(d.file, d.title)}>
+										<Button success small style={{marginRight : 10}} textStyle={{color : '#87838B'}} onPress={() => this.share(d.file, d.title)}>
 											<Icon name="share"/>
 										</Button>
-										<Button transparent textStyle={{color : '#87838B'}} onPress={() => this.exportTxt(d.file, d.title)}>
+										<Button success small style={{marginRight : 10}} textStyle={{color : '#87838B'}} onPress={() => this.exportTxt(d.file, d.title)}>
 											<Icon name="page-export" type="Foundation"/>
 										</Button>
-										<Button transparent textStyle={{color : '#87838B'}}>
+										<Button success small style={{marginRight : 10}} textStyle={{color : '#87838B'}}>
 											<Icon name="trash"/>
 										</Button>
 									</Left>
@@ -163,7 +184,7 @@ class Home extends Component {
 								<Text style={{fontSize : 30, color : '#888'}}>BELUM ADA DATA</Text>
 							</View>
 							<View style={{justifyContent : 'center', marginTop : 10}}>
-								<Button rounded info onPress={() => this.props.navigation.navigate('NewDoc')}>
+								<Button rounded success onPress={() => this.props.navigation.navigate('NewDoc')}>
 									<Text>Mulai Menulis</Text>
 								</Button>
 							</View>
@@ -190,9 +211,46 @@ class Home extends Component {
 	}
 }
 
+const HomeTab = TabNavigator({
+	ListDoc : {
+		screen : Home,
+		navigationOptions : {
+			tabBarLabel : 'Home'
+		}
+	},
+	Setting : {
+		screen : Setting,
+		navigationOptions : {
+			tabBarLabel : 'Pengaturan'
+		}
+	},
+	About : {
+		screen : About,
+		navigationOptions : {
+			tabBarLabel : 'Tentang'
+		}
+	},
+}, {
+	tabBarPosition : 'bottom',
+	tabBarOptions : {
+		style : {
+			backgroundColor : '#009C41'
+		},
+		activeBackgroundColor : '#0EAC51',
+		activeTintColor : '#FFF',
+		inactiveTintColor : '#DDD',
+		indicatorStyle : {
+			backgroundColor : '#FFF'
+		},
+		labelStyle : {
+			fontSize : 12
+		}
+	}
+})
+
 const Nav = StackNavigator({
 	Home : {
-		screen : Home
+		screen : HomeTab
 	},
 	NewDoc : {
 		screen : NewDoc

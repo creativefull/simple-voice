@@ -5,4 +5,8 @@
         <!-- Customize your theme here. -->
     </style>
 
+    <style name="CustomStyle" parent="AppTheme">
+        <item name="android:windowBackground">@drawable/avatar</item>
+    </style>
+
 </resources>

@@ -22,7 +22,6 @@ import material from '../../native-base-theme/variables/commonColor'
 import Voice from 'react-native-voice';
 const RNFS = require('react-native-fs');
 const _ = require('underscore')
-import {speak, lang, tts} from '../services/speak'
 
 import {
 	StyleSheet,
@@ -32,20 +31,43 @@ import {
 	ToastAndroid
 } from 'react-native'
 
+import Modal from './modal-view'
+
 class HeaderApp extends Component {
+	constructor() {
+		super()
+		this.state = {
+			modalView : false,
+			content : ''
+		}
+	}
+	async openModal() {
+		this.props.getContent().then((content) => {
+			this.setState({
+				modalView : true,
+				content : content
+			})
+		})
+	}
 	render() {
 		return (
-			<Header>
+			<Header androidStatusBarColor="#009C41" style={{backgroundColor : '#009C41'}}>
 				<Left>
 					<Button onPress={() => this.props.navigation.goBack()} transparent>
 						<Icon name='ios-arrow-back' type="Ionicons" />
 					</Button>
 				</Left>
 				<Body>
+					<Modal
+						titleDoc={this.props.theTitle}
+						modalVisible={this.state.modalView}
+						content={this.state.content}
+						closeModal={() => this.setState({ modalView : false})}
+					/>
 					<Title>{this.props.title || 'Menemu Baling'}</Title>
 				</Body>
 				<Right>
-					<Button transparent onPress={this.props.actionSpeak.bind()}>
+					<Button transparent onPress={this.openModal.bind(this)}>
 						<Icon name={this.props.isSpeak ? 'ios-volume-up' : 'ios-volume-off-outline'} type="Ionicons" />
 					</Button>
 					<Button transparent onPress={this.props.actionSave.bind()}>
@@ -60,9 +82,6 @@ class HeaderApp extends Component {
 class NewFile extends Component {
 	constructor(props) {
 		super(props)
-		tts.addEventListener('tts-start', this._ttsStart.bind(this))
-		tts.addEventListener('tts-finish', this._ttsFinish.bind(this))
-		tts.addEventListener('tts-cancel', this._ttsCancel.bind(this))
 
 		this.state = {
 			opacityVoice : new Animated.Value(1),
@@ -72,6 +91,7 @@ class NewFile extends Component {
 			textRecog : '',
 			theTitle : '',
 			initContent : '',
+			modalView : false,
 			focusInput : 'content',
 			speaking : false
 		}
@@ -84,36 +104,7 @@ class NewFile extends Component {
 		Voice.onSpeechResults = this.onSpeechResultsHandler.bind(this);
 		Voice.onSpeechPartialResults = this.onSpeechPartialResults.bind(this)
 		Voice.onSpeechRecognized = this.onSpeechRecognized.bind(this)
-	}
-
-	// TEXT TO SPEACH EVENT
-	_ttsStart(e) {
-		this.setState({
-			speaking : true
-		})
-		ToastAndroid.show('Memulai Membaca Document', ToastAndroid.CENTER)
-	}
-	_ttsFinish(e) {
-		this.setState({
-			speaking : false
-		})
-		ToastAndroid.show('Selesai Membaca Document', ToastAndroid.CENTER)
-	}
-	_ttsCancel(e) {
-		this.setState({
-			speaking : false
-		})
-		ToastAndroid.show('Membaca Document Dibatalkan', ToastAndroid.CENTER)		
-	}
-	async speakNow() {
-		if (this.state.speaking) {
-			tts.stop()
-		} else {
-			lang()
-			let regex = /(<([^>]+)>)/ig
-			let content = await this.richtext.getContentHtml()
-			speak(content.toString().replace(regex, ''))
-		}
+		this.timer = null
 	}
 
 	async componentWillUnmount () {
@@ -255,6 +246,13 @@ class NewFile extends Component {
 		}
 
 		this.readDir()
+
+		this.timer = setInterval(async () => {
+			let theTitle = await this.richtext.getTitleText()
+			this.setState({
+				theTitle : theTitle
+			})
+		}, 3000)
 	}
 
 	_keyboardDidShow () {
@@ -352,6 +350,7 @@ class NewFile extends Component {
 
 	componentWillUnmount() {
 		Voice.destroy().then(Voice.removeAllListeners);
+		clearInterval(this.timer)
 	}
 
 	async onSpeechRecognized(e) {
@@ -389,12 +388,21 @@ class NewFile extends Component {
 		}
 	}
 
+	async getContent() {
+		return new Promise(async (resolve, reject) => {
+			let content = await this.richtext.getContentHtml()
+			return resolve(content)
+		})
+	}
+
 	render() {
 		return (
 			<StyleProvider style={getTheme(material)}>
 				<Container>
 					<HeaderApp
-						actionSpeak={this.speakNow.bind(this)}
+						theTitle={this.state.theTitle}
+						getContent={this.getContent.bind(this)}
+						initContent={this.state.initContent}
 						actionSave={this.saveFile.bind(this)}
 						isSpeak={this.state.speaking}
 						ref={ref => this.headerTitle = ref}
@@ -415,7 +423,7 @@ class NewFile extends Component {
 
 					<Animated.View style={{opacity : this.state.opacityVoice, height : this.state.heightVoice}}>
 						<Footer style={{height : 100}}>
-							<FooterTab style={{padding : 20, backgroundColor : '#2980B9'}}>
+							<FooterTab style={{padding : 20, backgroundColor : '#009C41'}}>
 								<Button full style={{padding : 40}} transparent onPress={this.startVoice.bind(this)}>
 									<Icon name={this.state.startedVoice == false ? "keyboard-voice" : "settings-voice"} type="MaterialIcons" style={{fontSize : 50, color : '#FFF', margin : 40}}/>
 								</Button>

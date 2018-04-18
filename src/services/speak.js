@@ -4,8 +4,8 @@ exports.lang = async (l = 'id-ID') => {
 	tts.setDefaultLanguage(l)
 }
 
-tts.setDefaultRate(0.5)
-exports.speak = (async (text) => {
+tts.setDefaultRate(0.8)
+exports.speak = (async (text = 'Tidak ada content') => {
 	tts.speak(text)
 })
 
