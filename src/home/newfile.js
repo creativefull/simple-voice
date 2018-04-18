@@ -119,7 +119,7 @@ class NewFile extends Component {
 
 	isExistNotes() {
 		return new Promise((resolve, reject) => {
-			RNFS.exists(RNFS.DocumentDirectoryPath + '/notes').then((result) => {
+			RNFS.exists(RNFS.ExternalDirectoryPath + '/notes').then((result) => {
 				return resolve(result)
 			}).catch((e) => {
 				return reject(e)
@@ -129,8 +129,8 @@ class NewFile extends Component {
 
 	readDir() {
 		this.isExistNotes().then((isExist) => {
-			RNFS.mkdir(RNFS.DocumentDirectoryPath + '/notes').then((result) => {
-				RNFS.readDir(RNFS.DocumentDirectoryPath + '/notes').then((result) => {
+			RNFS.mkdir(RNFS.ExternalDirectoryPath + '/notes').then((result) => {
+				RNFS.readDir(RNFS.ExternalDirectoryPath + '/notes').then((result) => {
 					// alert(JSON.stringify(result))
 					console.log('OK')
 				}).catch((e) => {
@@ -142,7 +142,7 @@ class NewFile extends Component {
 
 	writeFile(title, content) {
 		return new Promise((resolve, reject) => {
-			RNFS.writeFile(RNFS.DocumentDirectoryPath + '/notes/' + title, content, 'utf8').then((result) => {
+			RNFS.writeFile(RNFS.ExternalDirectoryPath + '/notes/' + title, content, 'utf8').then((result) => {
 				return resolve(true)
 			}).catch((e) => {
 				return reject(e)
@@ -217,11 +217,11 @@ class NewFile extends Component {
 	}
 
 	getFileContent(file) {
-		// alert(RNFS.DocumentDirectoryPath + '/notes/' + file)
-		RNFS.exists(RNFS.DocumentDirectoryPath + '/notes/' + file).then((onoFile) => {
+		// alert(RNFS.ExternalDirectoryPath + '/notes/' + file)
+		RNFS.exists(RNFS.ExternalDirectoryPath + '/notes/' + file).then((onoFile) => {
 			// alert(onoFile)
 			if (onoFile) {
-				RNFS.readFile(RNFS.DocumentDirectoryPath + '/notes/' + file).then((contentFile) => {
+				RNFS.readFile(RNFS.ExternalDirectoryPath + '/notes/' + file).then((contentFile) => {
 					// alert(contentFile)
 					this.setState({
 						initContent : contentFile
@@ -246,13 +246,15 @@ class NewFile extends Component {
 		}
 
 		this.readDir()
+	}
 
+	componentWillMount() {
 		this.timer = setInterval(async () => {
 			let theTitle = await this.richtext.getTitleText()
 			this.setState({
 				theTitle : theTitle
 			})
-		}, 3000)
+		}, 3000)		
 	}
 
 	_keyboardDidShow () {

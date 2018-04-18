@@ -21,7 +21,9 @@ export default class ModalView extends Component {
 			modalVisible : false,
 			content : [],
 			speaking : false,
-			counterPart : 0
+			speakJudul : false,
+			counterPart : 0,
+			repeat : false
 		}
 
 		tts.addEventListener('tts-start', this._ttsStart.bind(this))
@@ -37,18 +39,36 @@ export default class ModalView extends Component {
 		ToastAndroid.show('Memulai Membaca Document', ToastAndroid.CENTER)
 	}
 	_ttsFinish(e) {
-		this.setState({
-			counterPart : this.state.counterPart + 1,
-			speaking : false
-		}, () => {
-			// alert(this.state.content)
-			let content = this.props.content.split(".")
-			if (content[this.state.counterPart] != '' && content[this.state.counterPart] != null) {
-				this.speakNow(content[this.state.counterPart])
-			} else {
-				ToastAndroid.show('Selesai Membaca Document', ToastAndroid.CENTER)
-			}
-		})
+		if (this.state.speakJudul) {
+			this.setState({
+				speakJudul : false
+			}, () => {
+				this.setState({
+					speaking : false
+				}, () => {
+					let content = this.props.content.split(".")
+					if (content[this.state.counterPart] != '' && content[this.state.counterPart] != null) {
+						this.speakNow(content[this.state.counterPart])
+					} else {
+						ToastAndroid.show('Selesai Membaca Document', ToastAndroid.CENTER)
+					}							
+				})
+			})
+		} else {
+			let c = !this.state.repeat ? this.state.counterPart + 1 : this.state.counterPart
+			this.setState({
+				counterPart : c,
+				speaking : false
+			}, () => {
+				// alert(this.state.content)
+				let content = this.props.content.split(".")
+				if (content[this.state.counterPart] != '' && content[this.state.counterPart] != null) {
+					this.speakNow(content[this.state.counterPart])
+				} else {
+					ToastAndroid.show('Selesai Membaca Document', ToastAndroid.CENTER)
+				}
+			})
+		}
 	}
 	_ttsCancel(e) {
 		this.setState({
@@ -62,11 +82,17 @@ export default class ModalView extends Component {
 			tts.stop()
 		} else {
 			lang()
-			if (contents) {
-				let regex = /(<([^>]+)>)/ig
-				let content = contents.replace(new RegExp('&nbsp;', 'gi'), ' ')
-				let content2 = content.toString().replace(regex, '')
-				speak(content2)
+			if (this.state.speakJudul) {
+				if (this.props.titleDoc) {
+					speak(this.props.titleDoc)
+				}
+			} else {
+				if (contents) {
+					let regex = /(<([^>]+)>)/ig
+					let content = contents.replace(new RegExp('&nbsp;', 'gi'), ' ')
+					let content2 = content.toString().replace(regex, '')
+					speak(content2)
+				}
 			}
 		}
 	}
@@ -76,7 +102,8 @@ export default class ModalView extends Component {
 		let part = contents.split(".")
 		this.setState({
 			counterPart : counter,
-			content : this.props.content
+			content : this.props.content,
+			speakJudul : counter == 0
 		}, () => {
 			// tts.stop()
 			this.speakNow(part[this.state.counterPart])
@@ -95,7 +122,7 @@ export default class ModalView extends Component {
 								{
 									x.map((x1, k2) => {
 										return (
-											<TouchableHighlight key={k2} underlayColor="#FDE3A7" onPress={() => this.play(k1)} style={{backgroundColor : (this.state.counterPart == k1 && this.state.speaking) ? '#FDE3A7' : '#FFF'}}>
+											<TouchableHighlight key={k2} underlayColor="#FDE3A7" onPress={() => this.play(k1)} style={{backgroundColor : (this.state.counterPart == k1 && this.state.speaking && !this.state.speakJudul) ? '#FDE3A7' : '#FFF'}}>
 												<HtmlView value={x1}/>
 											</TouchableHighlight>
 										)
@@ -131,8 +158,11 @@ export default class ModalView extends Component {
 						<Button style={styles.btnControl} onPress={() => this.play(this.state.counterPart + 1)} success>
 							<Icon name="ios-arrow-dropright-outline" type="Ionicons"/>
 						</Button>
-						<Button style={styles.btnControl} onPress={() => this.play()} success>
-							<Icon name="ios-repeat-outline" type="Ionicons"/>
+						<Button style={styles.btnControl} onPress={() => {
+							ToastAndroid.show('Mengulang Aktif', ToastAndroid.SHORT)
+							this.setState({ repeat : !this.state.repeat })
+						}} success>
+							<Icon name={this.state.repeat ? "ios-more" : "repeat"} type="Ionicons"/>
 						</Button>
 					</View>
 				</Container>
@@ -153,7 +183,13 @@ export default class ModalView extends Component {
 				}}>
 				<View style={{padding : 20, flex : 1}}>
 					<ScrollView>
-						<Text style={{marginBottom : 10}}>{this.state.titleDoc}</Text>
+						<TouchableHighlight
+							onPress={() => {
+								this.play(0)
+							}}
+							style={{backgroundColor : (this.state.counterPart == 0 && this.state.speaking && this.state.speakJudul) ? '#FDE3A7' : '#FFF'}}>
+							<Text style={{marginBottom : 10}}>{this.props.titleDoc}</Text>
+						</TouchableHighlight>
 						<View style={{height : 1, marginBottom : 20, backgroundColor : '#CCC', flex : 1}}/>
 						{this.renderListText()}
 					</ScrollView>
