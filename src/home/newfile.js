@@ -30,6 +30,7 @@ import {
 	AsyncStorage,
 	ToastAndroid
 } from 'react-native'
+const ImagePicker = require('react-native-image-picker');
 
 import Modal from './modal-view'
 
@@ -51,9 +52,9 @@ class HeaderApp extends Component {
 	}
 	render() {
 		return (
-			<Header androidStatusBarColor="#009C41" style={{backgroundColor : '#009C41'}}>
+			<Header androidStatusBarColor="#007B70" style={{backgroundColor : '#007B70'}}>
 				<Left>
-					<Button onPress={() => this.props.navigation.goBack()} transparent>
+					<Button onPress={() => this.props.navigation.goBack()} accessibilityLabel="Kembali Ke Halaman Utama" transparent>
 						<Icon name='ios-arrow-back' type="Ionicons" />
 					</Button>
 				</Left>
@@ -67,10 +68,10 @@ class HeaderApp extends Component {
 					<Title>{this.props.title || 'Menemu Baling'}</Title>
 				</Body>
 				<Right>
-					<Button transparent onPress={this.openModal.bind(this)}>
+					<Button transparent onPress={this.openModal.bind(this)} accessibilityLabel="Baling Baca Dengan Telinga">
 						<Icon name={this.props.isSpeak ? 'ios-volume-up' : 'ios-volume-off-outline'} type="Ionicons" />
 					</Button>
-					<Button transparent onPress={this.props.actionSave.bind()}>
+					<Button transparent onPress={this.props.actionSave.bind()} accessibilityLabel="Simpan Document Anda">
 						<Icon name='save' type="MaterialIcons" />
 					</Button>
 				</Right>
@@ -164,7 +165,7 @@ class NewFile extends Component {
 			// IF DOCUMENT ALREADY EXISTS
 			if (whereID) {
 				let content = await this.richtext.getContentHtml()
-				this.writeFile(whereID.id + '.txt', content).then(async (result) => {
+				this.writeFile(whereID.id + '.html', content).then(async (result) => {
 					if (result) {
 						let theTitle = await this.richtext.getTitleText()
 						notes.map((value) => {
@@ -190,7 +191,7 @@ class NewFile extends Component {
 				let dataToSave = {
 					id : title,
 					title : await this.richtext.getTitleText(),
-					file : title + '.txt',
+					file : title + '.html',
 					created_at : new Date().getTime(),
 					time_update : new Date().getTime()
 				}
@@ -238,7 +239,7 @@ class NewFile extends Component {
 	componentDidMount() {
 		const {params} = this.props.navigation.state
 		this.setState({
-			theTitle : params ? params.title : 'Judul Document'
+			theTitle : params ? params.title : ''
 		})
 
 		if (params) {
@@ -397,6 +398,28 @@ class NewFile extends Component {
 		})
 	}
 
+	insertImage() {
+		let options = {
+			title : 'Pilih Photo',
+			storageOptions : {
+				skipBackup : true,
+				path : 'images'
+			},
+			noData : false
+		}
+		ImagePicker.showImagePicker(options, (response) => {
+			if (response.didCancel) {
+				console.log('User cancelled image picker');
+			}
+			else if (response.error) {
+				console.log('ImagePicker Error: ', response.error);
+			} else {
+				let source = {src : response.uri}
+				this.richtext.insertImage(source)
+			}
+		})
+	}
+
 	render() {
 		return (
 			<StyleProvider style={getTheme(material)}>
@@ -420,13 +443,14 @@ class NewFile extends Component {
 						editorInitializedCallback={this.initCallBackEditor.bind(this)}
 					/>
 					<RichTextToolbar
+						onPressAddImage={this.insertImage.bind(this)}
 						getEditor={() => this.richtext}
 					/>
 
 					<Animated.View style={{opacity : this.state.opacityVoice, height : this.state.heightVoice}}>
 						<Footer style={{height : 100}}>
-							<FooterTab style={{padding : 20, backgroundColor : '#009C41'}}>
-								<Button full style={{padding : 40}} transparent onPress={this.startVoice.bind(this)}>
+							<FooterTab style={{padding : 20, backgroundColor : '#007B70'}}>
+								<Button full style={{padding : 40}} transparent onPress={this.startVoice.bind(this)} accessibilityLabel="Menemu Menulis Dengan Mulut">
 									<Icon name={this.state.startedVoice == false ? "keyboard-voice" : "settings-voice"} type="MaterialIcons" style={{fontSize : 50, color : '#FFF', margin : 40}}/>
 								</Button>
 							</FooterTab>

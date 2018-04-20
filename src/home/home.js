@@ -19,6 +19,7 @@ import getTheme from '../../native-base-theme/components/'
 import material from '../../native-base-theme/variables/commonColor'
 import {downloadText} from '../services/saveas'
 import RNFS from 'react-native-fs'
+import Share from 'react-native-share'
 const moment = require('moment')
 
 import {
@@ -28,9 +29,9 @@ import {
 
 import {
 	ScrollView,
-	Share,
 	ToastAndroid,
 	View,
+	Alert,
 	Clipboard,
 	Linking,
 	AsyncStorage,
@@ -44,7 +45,7 @@ import Setting from './setting'
 class HeaderApp extends Component {
 	render() {
 		return (
-			<Header androidStatusBarColor="#009C41" style={{backgroundColor : '#009C41'}}>
+			<Header androidStatusBarColor="#007B70" style={{backgroundColor : '#007B70'}}>
 				<Body>
 					<Title>Menemu Baling</Title>
 				</Body>
@@ -64,7 +65,7 @@ class Home extends Component {
 
 	floatingButton() {
 		return (
-			<Button success style={{zIndex : 9, width : 70, height : 70, borderRadius : 70, justifyContent : 'center', position : 'absolute', bottom : 10, right : 10, alignItems : 'center'}} onPress={() => this.props.navigation.navigate('NewDoc')}>
+			<Button success style={{zIndex : 9, width : 70, height : 70, borderRadius : 70, justifyContent : 'center', position : 'absolute', bottom : 10, right : 10, alignItems : 'center'}} onPress={() => this.props.navigation.navigate('NewDoc')} accessibilityLabel="TAMBAH DOCUMENT BARU">
 				<Icon style={{fontSize : 30}} name="plus" type="FontAwesome"/>
 			</Button>
 		)
@@ -104,32 +105,45 @@ class Home extends Component {
 	}
 	
 	exportTxt(file, title) {
-		RNFS.readFile(RNFS.DocumentDirectoryPath + '/notes/' + file).then((content) => {
-			// var blob = new Blob([byteNumbers], {type: 'text/html'});
-			// let regex = /(<([^>]+)>)/ig
-			// htmlString = content.toString().replace(regex, '')
-			RNFS.writeFile(RNFS.ExternalDirectoryPath + '/notes/' + file + '.html', content, 'utf8').then((x) => {
-				// ToastAndroid.show('File berhasil di export lokasi file: ' + RNFS.ExternalStorageDirectoryPath + '/Documents/' + title + '.docx', ToastAndroid.LONG)
-				let url = 'file://' + RNFS.ExternalDirectoryPath + '/notes/' + file + '.html#t=1'
+		// RNFS.readFile(RNFS.DocumentDirectoryPath + '/notes/' + file).then((content) => {
+		// 	RNFS.writeFile(RNFS.ExternalDirectoryPath + '/notes/' + file + '.html', content, 'utf8').then((x) => {
+				let url = 'file://' + RNFS.ExternalDirectoryPath + '/notes/' + file
 				// Clipboard.setString(url)
-				Linking.openURL('googlechrome://navigate?url=' + url).catch(err => alert(JSON.stringify(err)))
-			})
-		})
+		ToastAndroid.show('File Berhasil Di Export ' + url, ToastAndroid.SHORT)
+				// Linking.openURL('googlechrome://navigate?url=' + url).catch(err => alert(JSON.stringify(err)))
+		// 	})
+		// })
 	}
 
 	async share(file, title) {
-		let fileToShare = await RNFS.readFile(RNFS.DocumentDirectoryPath + '/notes/' + file)
+		let fileToShare = RNFS.ExternalDirectoryPath + '/notes/' + file
 
 		let content = {
 			title : title,
-			message : fileToShare
+			message : 'File dishare dari menemu baling',
+			type : 'text/html',
+			url : 'file://' + fileToShare
 		}
 
-		Share.share(content)
+		Share.open(content)
 	}
 
-	confirmDelete() {
-		
+	confirmDelete(id, file) {
+		Alert.alert('Warning', 'Apakah anda yakin ingin menghapusnya ?', [{
+			text : 'TIDAK'
+		}, {
+			text : 'YA',
+			onPress : () => {
+				const {data} = this.state
+				let dataRemoved = data.filter((v) => v.id !== id)
+				AsyncStorage.setItem('notes', JSON.stringify(dataRemoved), (err) => {
+					this.getListDocument()
+					RNFS.unlink(RNFS.ExternalDirectoryPath + '/notes/' + file)
+					ToastAndroid.show('Data Berhasil Di Hapus', ToastAndroid.SHORT)
+				})
+				// alert(JSON.stringify(dataRemoved))
+			}
+		}])
 	}
 
 	renderNotes() {
@@ -159,13 +173,13 @@ class Home extends Component {
 								</CardItem> */}
 								<CardItem>
 									<Left>
-										<Button success small style={{marginRight : 10}} textStyle={{color : '#87838B'}} onPress={() => this.share(d.file, d.title)}>
+										<Button success small style={{marginRight : 10}} textStyle={{color : '#87838B'}} onPress={() => this.share(d.file, d.title)} accessibilityLabel="SHARE DOCUMENT">
 											<Icon name="share"/>
 										</Button>
-										<Button success small style={{marginRight : 10}} textStyle={{color : '#87838B'}} onPress={() => this.exportTxt(d.file, d.title)}>
+										<Button success small style={{marginRight : 10}} textStyle={{color : '#87838B'}} onPress={() => this.exportTxt(d.file, d.title)} accessibilityLabel="EXPORT DOCUMENT">
 											<Icon name="page-export" type="Foundation"/>
 										</Button>
-										<Button success small style={{marginRight : 10}} textStyle={{color : '#87838B'}}>
+										<Button success small style={{marginRight : 10}} textStyle={{color : '#87838B'}} onPress={() => this.confirmDelete(d.id, d.file)} accessibilityLabel="HAPUS DOCUMENT">
 											<Icon name="trash"/>
 										</Button>
 									</Left>
@@ -218,12 +232,12 @@ const HomeTab = TabNavigator({
 			tabBarLabel : 'Home'
 		}
 	},
-	Setting : {
-		screen : Setting,
-		navigationOptions : {
-			tabBarLabel : 'Pengaturan'
-		}
-	},
+	// Setting : {
+	// 	screen : Setting,
+	// 	navigationOptions : {
+	// 		tabBarLabel : 'Pengaturan'
+	// 	}
+	// },
 	About : {
 		screen : About,
 		navigationOptions : {
@@ -234,7 +248,7 @@ const HomeTab = TabNavigator({
 	tabBarPosition : 'bottom',
 	tabBarOptions : {
 		style : {
-			backgroundColor : '#009C41'
+			backgroundColor : '#007B70'
 		},
 		activeBackgroundColor : '#0EAC51',
 		activeTintColor : '#FFF',

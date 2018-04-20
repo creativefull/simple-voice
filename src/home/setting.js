@@ -26,6 +26,8 @@ import {
 	ToastAndroid,
 	AsyncStorage
 } from 'react-native'
+import getTheme from '../../native-base-theme/components/'
+import material from '../../native-base-theme/variables/commonColor'
 
 export default class About extends Component {
 	constructor() {
@@ -84,31 +86,33 @@ export default class About extends Component {
 	}
 	render() {
 		return (
-			<Container>
-				<Content>
-					<Card>
-						<CardItem>
-							<Body>
-								<Text>Pengaturan Suara</Text>
-							</Body>
-						</CardItem>
-						<CardItem>
-							<Body>
-								{this.renderForm()}
-							</Body>
-						</CardItem>
-						<CardItem>
-							<Left>
+			<StyleProvider style={getTheme(material)}>			
+				<Container>
+					<Content>
+						<Card>
+							<CardItem>
 								<Body>
-									<Button success onPress={this.onSave.bind(this)}>
-										<Text>Simpan</Text>
-									</Button>
+									<Text>Pengaturan Suara</Text>
 								</Body>
-							</Left>
-						</CardItem>
-					</Card>
-				</Content>
-			</Container>
+							</CardItem>
+							<CardItem>
+								<Body>
+									{this.renderForm()}
+								</Body>
+							</CardItem>
+							<CardItem>
+								<Left>
+									<Body>
+										<Button success onPress={this.onSave.bind(this)}>
+											<Text>Simpan</Text>
+										</Button>
+									</Body>
+								</Left>
+							</CardItem>
+						</Card>
+					</Content>
+				</Container>
+			</StyleProvider>
 		)
 	}
 }

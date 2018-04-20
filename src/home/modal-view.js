@@ -46,7 +46,7 @@ export default class ModalView extends Component {
 				this.setState({
 					speaking : false
 				}, () => {
-					let content = this.props.content.split(".")
+					let content = this.props.content.split("<br>")
 					if (content[this.state.counterPart] != '' && content[this.state.counterPart] != null) {
 						this.speakNow(content[this.state.counterPart])
 					} else {
@@ -61,7 +61,7 @@ export default class ModalView extends Component {
 				speaking : false
 			}, () => {
 				// alert(this.state.content)
-				let content = this.props.content.split(".")
+				let content = this.props.content.split("<br>")
 				if (content[this.state.counterPart] != '' && content[this.state.counterPart] != null) {
 					this.speakNow(content[this.state.counterPart])
 				} else {
@@ -88,10 +88,15 @@ export default class ModalView extends Component {
 				}
 			} else {
 				if (contents) {
-					let regex = /(<([^>]+)>)/ig
-					let content = contents.replace(new RegExp('&nbsp;', 'gi'), ' ')
-					let content2 = content.toString().replace(regex, '')
-					speak(content2)
+					if (!contents.match("<img")) {
+						let regex = /(<([^>]+)>)/ig
+						let content = contents.replace(new RegExp('&nbsp;', 'gi'), ' ')
+						let content2 = content.toString().replace(regex, '')
+						speak(content2)
+					} else {
+						speak('Gambar')
+						// alert(contents)
+					}
 				}
 			}
 		}
@@ -99,7 +104,7 @@ export default class ModalView extends Component {
 
 	play(counter = 0, play = true) {
 		let contents = this.props.content
-		let part = contents.split(".")
+		let part = contents.split("<br>")
 		this.setState({
 			counterPart : counter,
 			content : this.props.content,
@@ -111,25 +116,33 @@ export default class ModalView extends Component {
 	}
 
 	renderListText() {
-		let content = this.props.content.split(".")
+		let content = this.props.content.split("<br>")
 		if (content.length > 0) {
 			return (
 				<View>
 					{content.map((c, k1) => {
-						let x = c.split("<br>")
-						return (
-							<View key={k1}>
-								{
-									x.map((x1, k2) => {
-										return (
-											<TouchableHighlight key={k2} underlayColor="#FDE3A7" onPress={() => this.play(k1)} style={{backgroundColor : (this.state.counterPart == k1 && this.state.speaking && !this.state.speakJudul) ? '#FDE3A7' : '#FFF'}}>
-												<HtmlView value={x1}/>
-											</TouchableHighlight>
-										)
-									})
-								}
-							</View>
-						)
+						if (!c.match("<img")) {
+							let x = c.split(".")
+							return (
+								<View key={k1}>
+									{
+										x.map((x1, k2) => {
+											return (
+												<TouchableHighlight key={k2} underlayColor="#FDE3A7" onPress={() => this.play(k1)} style={{backgroundColor : (this.state.counterPart == k1 && this.state.speaking && !this.state.speakJudul) ? '#FDE3A7' : '#FFF'}}>
+													<HtmlView value={x1}/>
+												</TouchableHighlight>
+											)
+										})
+									}
+								</View>
+							)
+						} else {
+							return (
+								<TouchableHighlight key={k1} underlayColor="#FDE3A7" onPress={() => this.play(k1)} style={{backgroundColor : (this.state.counterPart == k1 && this.state.speaking && !this.state.speakJudul) ? '#FDE3A7' : '#FFF'}}>
+									<HtmlView value={c}/>
+								</TouchableHighlight>
+							)
+						}
 					})}
 				</View>
 			)
@@ -146,22 +159,22 @@ export default class ModalView extends Component {
 						<Button ref={ref => this.btnClose = ref} style={styles.btnControl} onPress={() => {
 							this.props.closeModal();
 							tts.stop()
-						}} success>
+						}} success accessibilityLabel="Tutup Baling">
 							<Icon name="ios-close-circle-outline"/>
 						</Button>
-						<Button style={styles.btnControl} onPress={() => this.play(this.state.counterPart - 1)} success>
+						<Button style={styles.btnControl} onPress={() => this.play(this.state.counterPart - 1)} success accessibilityLabel="Membaca Kalimat Sebelumnya">
 							<Icon name="ios-arrow-dropleft-outline" type="Ionicons"/>
 						</Button>
-						<Button style={styles.btnControl} onPress={() => this.play()} success>
+						<Button style={styles.btnControl} onPress={() => this.play()} success accessibilityLabel="Berhenti atau Mulai Membaca Dengan Telinga">
 							<Icon name={this.state.speaking ? "ios-pause-outline" : "ios-play-outline"} type="Ionicons"/>
 						</Button>
-						<Button style={styles.btnControl} onPress={() => this.play(this.state.counterPart + 1)} success>
+						<Button style={styles.btnControl} onPress={() => this.play(this.state.counterPart + 1)} success accessibilityLabel="Membaca Kalimat Selanjutnya">
 							<Icon name="ios-arrow-dropright-outline" type="Ionicons"/>
 						</Button>
 						<Button style={styles.btnControl} onPress={() => {
 							ToastAndroid.show('Mengulang Aktif', ToastAndroid.SHORT)
 							this.setState({ repeat : !this.state.repeat })
-						}} success>
+						}} success accessibilityLabel="Mengulang">
 							<Icon name={this.state.repeat ? "ios-more" : "repeat"} type="Ionicons"/>
 						</Button>
 					</View>

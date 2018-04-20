@@ -80,7 +80,7 @@ class App extends Component {
 
     render() {
       return (
-        <Container style={{backgroundColor : '#009C41', justifyContent : 'center', alignItems : 'center'}}>
+        <Container style={{backgroundColor : '#007B70', justifyContent : 'center', alignItems : 'center'}}>
           <Animated.View style={{opacity : this.state.fadeAnim, alignItems : 'center'}}>
             <Text style={{color : '#FFF', fontSize : 20, fontFamily : 'Roboto-Medium'}} uppercase>SELAMAT DATANG DI APLIKASI</Text>
             <Text style={{color : '#FFF', fontWeight : 'bold', fontSize : 30, fontFamily : 'Roboto-Black'}} uppercase>MENEMU BALING</Text>

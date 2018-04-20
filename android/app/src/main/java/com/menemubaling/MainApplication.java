@@ -3,6 +3,7 @@ package com.menemubaling;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.imagepicker.ImagePickerPackage;
 import io.rumors.reactnativesettings.RNSettingsPackage;
 import cl.json.RNSharePackage;
 import net.no_mad.tts.TextToSpeechPackage;
@@ -20,8 +21,9 @@ import com.wix.reactnativekeyboardinput.KeyboardInputPackage;
 
 import java.util.Arrays;
 import java.util.List;
+import cl.json.ShareApplication;
 
-public class MainApplication extends Application implements ReactApplication {
+public class MainApplication extends Application implements ShareApplication, ReactApplication {
 
   private final ReactNativeHost mReactNativeHost = new ReactNativeHost(this) {
     @Override
@@ -33,6 +35,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new ImagePickerPackage(),
             new RNSettingsPackage(),
             new RNSharePackage(),
             new TextToSpeechPackage(),
@@ -61,5 +64,10 @@ public class MainApplication extends Application implements ReactApplication {
   public void onCreate() {
     super.onCreate();
     SoLoader.init(this, /* native exopackage */ false);
+  }
+
+  @Override
+  public String getFileProviderAuthority() {
+    return "com.menemubaling.provider";
   }
 }
