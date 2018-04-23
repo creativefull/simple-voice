@@ -158,7 +158,7 @@ export default class Step1 extends Component {
       <TouchableOpacity style={{marginTop : 20, marginBottom : 20}} onPress={this.onStartButtonPress.bind(this)}>
 		<Animated.View style={{borderRadius : 100, borderWidth : this.state.voiceButton, borderColor : '#FFF', justifyContent : 'center', alignItems : 'center'}}>
 			<View style={{width : 100, height : 100, borderRadius : 100, backgroundColor : '#FFF', justifyContent : 'center', alignItems : 'center'}}>
-				<Icon name={this.state.started == false ? "keyboard-voice" : "settings-voice"} type="MaterialIcons" style={{color : '#2980B9', fontSize : 50}}/>
+				<Icon name={this.state.started == false ? "keyboard-voice" : "settings-voice"} type="MaterialIcons" style={{color : '#007B70', fontSize : 50}}/>
 			</View>
 		</Animated.View>
       </TouchableOpacity>
@@ -170,7 +170,7 @@ export default class Step1 extends Component {
       <Container style={styles.container}>
         <Animated.View style={{opacity : this.state.fadeAnim, alignItems : 'center', justifyContent : 'center'}}>
           <Text style={{color : '#FFF', fontWeight : 'bold', fontSize : 20, fontFamily : 'Roboto-Medium'}} uppercase>1. TEST BERBICARA</Text>
-          <Text style={{color : '#FFF', fontSize : 10, fontFamily : 'Roboto-Black'}} uppercase>PASTIKAN SMARTPHONE KAMU SUDAH KE INSTALL GOOGLE VOICE</Text>
+          <Text style={{color : '#FFF', fontSize : 10, fontFamily : 'Roboto-Black'}} uppercase>PASTIKAN SMARTPHONE ANDA SUDAH KE INSTALL GOOGLE VOICE</Text>
           <Text style={{color : '#FFF', fontSize : 10, fontFamily : 'Roboto-Black'}} uppercase>KLIK TOMBOL DI BAWAH INI KEMUDIAN BERBICARALAH</Text>
 
           {this.renderButtonTest()}
@@ -189,6 +189,6 @@ export default class Step1 extends Component {
 
 const styles = StyleSheet.create({
   container : {
-    backgroundColor : '#2980B9', justifyContent : 'center', alignItems : 'center'    
+    backgroundColor : '#007B70', justifyContent : 'center', alignItems : 'center'    
   }
 })
