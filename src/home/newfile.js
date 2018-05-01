@@ -96,6 +96,8 @@ class NewFile extends Component {
 			focusInput : 'content',
 			speaking : false
 		}
+		this.lengtPart = 0;
+
 		this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', this._keyboardDidShow.bind(this));
 		this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', this._keyboardDidHide.bind(this));
 
@@ -115,7 +117,11 @@ class NewFile extends Component {
 			initContent : ''
 		})
 		await Voice.stop()
-		Voice.destroy()
+		Voice.destroy().then(Voice.removeAllListeners)
+		clearInterval(this.timer)
+		Keyboard.dismiss()
+
+		this.lengtPart = 0
 	}
 
 	isExistNotes() {
@@ -165,6 +171,7 @@ class NewFile extends Component {
 			// IF DOCUMENT ALREADY EXISTS
 			if (whereID) {
 				let content = await this.richtext.getContentHtml()
+				Keyboard.dismiss()
 				this.writeFile(whereID.id + '.html', content).then(async (result) => {
 					if (result) {
 						let theTitle = await this.richtext.getTitleText()
@@ -181,7 +188,7 @@ class NewFile extends Component {
 							}
 							
 							ToastAndroid.show('Berhasil Menyimpan Document ' + whereID.title, ToastAndroid.LONG)
-							this.props.navigation.navigate('Home')
+							this.props.navigation.goBack()
 						})
 					} else {
 						ToastAndroid.show('Tidak dapat menyimpan document', ToastAndroid.CENTER)
@@ -297,6 +304,8 @@ class NewFile extends Component {
 			theTitle : titleContent,
 			textPartial : ' '
 		})
+
+		this.lengtPart = 0
 	}
 
 	async onSpeechEndHandler(e) {
@@ -305,11 +314,13 @@ class NewFile extends Component {
 			textPartial : ' '
 		})
 
+		this.lengtPart = 0
 		// this.richtext.setContentHTML('ok ok ok')
 	}
 
 	async _stopRecognizing(e) {
 		try {
+			this.lengtPart = 0
 		await Voice.stop();
 		} catch (e) {
 		console.error(e);
@@ -317,24 +328,32 @@ class NewFile extends Component {
 	}
 
 	async onSpeechPartialResults(e) {
-		var x = this.state.textPartial
-		this.setState({
-			textPartial : e.value[0],
-		})
+		// var x = this.state.textPartial
+		// this.setState({
+		// 	textPartial : e.value[0],
+		// })
 		// let content = await this.richtext.getContentHtml()
 		// if (this.state.focusInput == 'content') {
 		// 	this.richtext.setContentHTML( this.state.initContent + ' ' + this.state.textPartial)
 		// } else {
 		// 	this.richtext.setTitleHTML(this.state.theTitle + ' ' + this.state.textPartial)
 		// }
-		let lengthSekarang = e.value[0].split(' ').length
-		let lengthSebelum = x.split(' ').length
-		let resultPart = lengthSebelum < lengthSekarang ? lengthSebelum == 1 ? e.value[0] :  e.value[0].split(' ')[lengthSekarang - 1] : ''
+		// let lengthSekarang = e.value[0].split(' ').length
+		// let lengthSebelum = x.split(' ').length
+		// let resultPart = lengthSebelum < lengthSekarang ? lengthSebelum == 1 ? e.value[0] :  e.value[0].split(' ')[lengthSekarang - 1] : ''
 
-		if (resultPart) {
+		// console.log("SELESAI", new Date().getMilliseconds())
+		// console.log(e.value[0].split(" ").pop())
+
+		let x = e.value[0].split(" ").length
+		if (this.lengtPart < x) {
+			this.lengtPart = x
+			let isinya = this.lengtPart == 1 ? e.value[0] : e.value[0].split(" ").pop()
 			this.richtext.prepareInsert()
-			this.richtext.insertNextText(resultPart + " ")
+			this.richtext.insertNextText( isinya + " ")
 		}
+		// if (lengthSekarang > lengthSebelum) {
+		// }
 	}
 
 	setFocusHandlers() {
@@ -349,11 +368,6 @@ class NewFile extends Component {
 		// 		focusInput : 'content'
 		// 	})
 		// })
-	}
-
-	componentWillUnmount() {
-		Voice.destroy().then(Voice.removeAllListeners);
-		clearInterval(this.timer)
 	}
 
 	async onSpeechRecognized(e) {
@@ -379,13 +393,16 @@ class NewFile extends Component {
 	async startVoice() {
 		// this.richtext.setContentHTML('ini contoh pas di klik')
 		if (!this.state.startedVoice) {
-			Voice.start('id-ID');
-			this.richtext.setContentFocusHandler(async () => {
-				let content = await this.richtext.getContentHtml()
-				this.setState({
-					initContent : content
+			Voice.start('id-ID').then(() => {
+				this.richtext.setContentFocusHandler(async () => {
+					let content = await this.richtext.getContentHtml()
+					this.setState({
+						initContent : content
+					})
 				})
-			})
+			}).catch((e) => {
+				ToastAndroid.show('Timeout', ToastAndroid.SHORT)
+			});
 		} else {
 			await Voice.stop()
 		}

@@ -40,11 +40,11 @@ class App extends Component {
 
     checkSetup() {
       const {navigate} = this.props.navigation
-      AsyncStorage.getItem('setup', (err, value) => {
-        if (value) {
-          navigate('HomeApp')
-        }
-      })
+      // AsyncStorage.getItem('setup', (err, value) => {
+      //   if (value) {
+          // navigate('HomeApp')
+      //   }
+      // })
     }
     
     componentDidMount() {
