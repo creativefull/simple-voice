@@ -55,7 +55,7 @@ export default class About extends Component {
 					<Slider
 						step={0.1}
 						value={this.state.kecepatan}
-						maximumValue={3}
+						maximumValue={1}
 						onValueChange={(kecepatan) => this.setState({ kecepatan })}/>
 				</View>
 			</View>

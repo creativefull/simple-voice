@@ -31,6 +31,9 @@ export default class ModalView extends Component {
 		tts.addEventListener('tts-cancel', this._ttsCancel.bind(this))
 	}
 
+	componentDidMount() {
+		lang()
+	}
 	// TEXT TO SPEACH EVENT
 	_ttsStart(e) {
 		this.setState({
@@ -81,7 +84,6 @@ export default class ModalView extends Component {
 		if (this.state.speaking) {
 			tts.stop()
 		} else {
-			lang()
 			if (this.state.speakJudul) {
 				if (this.props.titleDoc) {
 					speak(this.props.titleDoc)

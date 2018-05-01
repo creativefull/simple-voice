@@ -232,12 +232,12 @@ const HomeTab = TabNavigator({
 			tabBarLabel : 'Home'
 		}
 	},
-	// Setting : {
-	// 	screen : Setting,
-	// 	navigationOptions : {
-	// 		tabBarLabel : 'Pengaturan'
-	// 	}
-	// },
+	Setting : {
+		screen : Setting,
+		navigationOptions : {
+			tabBarLabel : 'Pengaturan'
+		}
+	},
 	About : {
 		screen : About,
 		navigationOptions : {

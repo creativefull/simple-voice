@@ -131,13 +131,14 @@ export default class Step1 extends Component {
 
   pindahMenu() {
 		const {navigate} = this.props.navigation
-		AsyncStorage.setItem('setup', 'true', (err) => {
-			if (!err) {
-				navigate('HomeApp')
-			} else {
-				alert('Terjadi Kesalahan')
-			}
-		})
+		navigate('HomeApp')
+		// AsyncStorage.setItem('setup', 'true', (err) => {
+		// 	if (!err) {
+		// 		navigate('HomeApp')
+		// 	} else {
+		// 		alert('Terjadi Kesalahan')
+		// 	}
+		// })
   }
 
   successTest() {
