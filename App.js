@@ -24,6 +24,7 @@ import {
 
 // STEP SCREEN 
 import SplashStep1 from './src/step/step1'
+import SplashStep2 from './src/step/step2'
 import Menu from './src/step/menu'
 
 import HomeApp from './src/home/home'
@@ -111,6 +112,9 @@ const Routring = StackNavigator({
   SplashStep1 : {
     screen : SplashStep1
   },
+  SplashStep2 : {
+    screen : SplashStep2
+  },
   HomeApp : {
     screen : HomeApp
   },
@@ -118,7 +122,7 @@ const Routring = StackNavigator({
     screen : Menu
   }
 }, {
-  initialRouteName : 'Splash',
+  initialRouteName : 'HomeApp',
   headerMode : 'none'
 })
 

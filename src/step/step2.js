@@ -9,7 +9,9 @@ import {
   Animated,
   StyleSheet,
 	Easing,
+	Linking,
 	AsyncStorage,
+	NativeModules,
   TouchableOpacity
 } from 'react-native'
 import {
@@ -20,8 +22,9 @@ import {
   Icon
 } from 'native-base'
 import Voice from 'react-native-voice';
+const RNSettings = NativeModules.RNSettings
 
-export default class Step1 extends Component {
+export default class Step2 extends Component {
   constructor() {
     super()
     this.state = {
@@ -126,12 +129,17 @@ export default class Step1 extends Component {
         duration : 1000
       }
     ).start(() => {
+		this.successTest()
     })
   }
 
+  openGoogleTalkBack() {
+		RNSettings.openAccessBility()
+	}
+
   pindahMenu() {
 		const {navigate} = this.props.navigation
-		navigate('SplashStep2')
+		navigate('HomeApp')
 		// AsyncStorage.setItem('setup', 'true', (err) => {
 		// 	if (!err) {
 		// 		navigate('HomeApp')
@@ -159,7 +167,8 @@ export default class Step1 extends Component {
       <TouchableOpacity style={{marginTop : 20, marginBottom : 20}} onPress={this.onStartButtonPress.bind(this)}>
 		<Animated.View style={{borderRadius : 100, borderWidth : this.state.voiceButton, borderColor : '#FFF', justifyContent : 'center', alignItems : 'center'}}>
 			<View style={{width : 100, height : 100, borderRadius : 100, backgroundColor : '#FFF', justifyContent : 'center', alignItems : 'center'}}>
-				<Icon name={this.state.started == false ? "keyboard-voice" : "settings-voice"} type="MaterialIcons" style={{color : '#007B70', fontSize : 50}}/>
+				{/* <Icon name={this.state.started == false ? "keyboard-voice" : "settings-voice"} type="MaterialIcons" style={{color : '#007B70', fontSize : 50}}/> */}
+				<Text>Aktifkan Mantra</Text>
 			</View>
 		</Animated.View>
       </TouchableOpacity>
@@ -170,18 +179,23 @@ export default class Step1 extends Component {
     return (
       <Container style={styles.container}>
         <Animated.View style={{opacity : this.state.fadeAnim, alignItems : 'center', justifyContent : 'center'}}>
-          <Text style={{color : '#FFF', fontWeight : 'bold', fontSize : 20, fontFamily : 'Roboto-Medium'}} uppercase>1. TEST BERBICARA</Text>
-          <Text style={{color : '#FFF', fontSize : 10, fontFamily : 'Roboto-Black'}} uppercase>PASTIKAN SMARTPHONE ANDA SUDAH TERINSTALL GOOGLE VOICE</Text>
-          <Text style={{color : '#FFF', fontSize : 10, fontFamily : 'Roboto-Black'}} uppercase>KLIK TOMBOL DI BAWAH INI KEMUDIAN BERBICARALAH</Text>
+          <Text style={{color : '#FFF', fontWeight : 'bold', fontSize : 20, fontFamily : 'Roboto-Medium'}} uppercase>2. REVOLUSI TULIS BACA</Text>
+          <Text style={{color : '#FFF', fontSize : 10, fontFamily : 'Roboto-Black', textAlign : 'center'}} uppercase>MANTRA - Memampukan Penyandang Tunanetra</Text>
 
-          {this.renderButtonTest()}
-		  <Text style={{color : '#FFF', textAlign : 'center'}} uppercase>{this.state.textRecog} {this.state.textPartial}</Text>
-        </Animated.View>
-		<Animated.View style={{marginTop : this.state.marginButtonNext, opacity : this.state.opacityButtonNext, justifyContent : 'center', alignItems : 'center'}}>
-			<Button rounded bordered style={{borderColor : '#FFF', paddingLeft : 30, paddingRight : 30}} onPress={this.pindahMenu.bind(this)}>
-				<Text style={{color : '#FFF'}}>LANGKAH SELANJUTNYA</Text>
-			</Button>
-		</Animated.View>
+          {/* {this.renderButtonTest()} */}
+				  <Text style={{color : '#FFF', textAlign : 'center'}} uppercase>{this.state.textRecog} {this.state.textPartial}</Text>
+				</Animated.View>
+				<Animated.View style={{marginTop : this.state.marginButtonNext, opacity : this.state.opacityButtonNext, justifyContent : 'center', alignItems : 'center', flexWrap: 'wrap',}}>
+					<View style={{justifyContent : 'center', alignItems : 'center', alignContent : 'center'}}>
+						<TouchableOpacity style={{borderColor : '#FFF', marginBottom : 20, padding : 20, paddingLeft : 30, paddingRight : 30, borderWidth : 1, borderRadius : 50}} onPress={this.pindahMenu.bind(this)} accessibilityLabel="MENUJU KE HALAMAN UTAMA MENEMU BALING">
+							<Text style={{color : '#FFF', fontSize : 13}}>MENEMU BALING</Text>
+						</TouchableOpacity>
+						<TouchableOpacity style={{borderColor : '#FFF', marginBottom : 20, paddingLeft : 30, paddingRight : 30, borderWidth : 1, borderRadius : 50, padding : 20}} onPress={this.openGoogleTalkBack.bind(this)} accessibilityLabel="MANTRA - Memampukan Penyandang Tunanetra. Pastikan Android Anda sudah terinstal Google Talkback">
+							<Text style={{color : '#FFF', fontSize : 12}}>MANTRA MENEMU BALING</Text>
+						</TouchableOpacity>
+						<Text style={{color : '#FFF', textAlign : 'center', fontSize : 10, fontStyle : 'italic'}}>Memampukan Tunanetra Menulis dengan Mulut dan Membaca dengan Telinga</Text>
+					</View>
+				</Animated.View>
       </Container>
     )
   }

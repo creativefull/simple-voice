@@ -94,7 +94,9 @@ class NewFile extends Component {
 			initContent : '',
 			modalView : false,
 			focusInput : 'content',
-			speaking : false
+			alreadyInput : false,
+			speaking : false,
+			langDefault : 'id-ID'
 		}
 		this.lengtPart = 0;
 
@@ -157,6 +159,71 @@ class NewFile extends Component {
 		})
 	}
 
+	autoSave() {
+		const {params} = this.props.navigation.state
+		let title = params ? params.id != undefined ? params.id : new Date().getTime() : new Date().getTime()
+
+		AsyncStorage.getItem('notes', async (err, notes) => {
+			if (err) {
+				ToastAndroid.show('Devices Not Supported', ToastAndroid.SHORT)
+			}
+
+			notes = JSON.parse(notes)
+			let whereID = _.findWhere(notes, {id : title})
+			// IF DOCUMENT ALREADY EXISTS
+			if (whereID) {
+				let content = await this.richtext.getContentHtml()
+				this.writeFile(whereID.id + '.html', content).then(async (result) => {
+					if (result) {
+						let theTitle = await this.richtext.getTitleText()
+						notes.map((value) => {
+							if (whereID.id == value.id) {
+								value.title = theTitle
+								value.time_update = new Date().getTime()
+							}
+						})
+
+						AsyncStorage.setItem('notes', JSON.stringify(notes), (err, res) => {
+							if (err) {
+								return alert('Tidak dapat menyimpan document')
+							}
+							
+							ToastAndroid.show('Berhasil Menyimpan Document ' + whereID.title, ToastAndroid.LONG)
+						})
+					} else {
+						ToastAndroid.show('Tidak dapat menyimpan document', ToastAndroid.CENTER)
+					}
+				})
+			} else {
+				let dataToSave = {
+					id : title,
+					title : await this.richtext.getTitleText(),
+					file : title + '.html',
+					created_at : new Date().getTime(),
+					time_update : new Date().getTime()
+				}
+				let content = await this.richtext.getContentHtml()
+				this.writeFile(dataToSave.file, content).then((result) => {
+					if (result) {
+						let data = notes ? notes : []
+						data.push(dataToSave)
+
+						AsyncStorage.setItem('notes', JSON.stringify(data), (err, result) => {
+							if (err) {
+								return ToastAndroid.show('Gagal Menyimpan', ToastAndroid.SHORT)
+							}
+							
+							this.props.navigation.setParams({id : title})							
+							ToastAndroid.show('Disimpan', ToastAndroid.SHORT)
+						})
+					} else {
+						ToastAndroid.show('Gagal Menyimpan', ToastAndroid.SHORT)
+					}
+				})
+			}
+		})
+	}
+	
 	saveFile() {
 		const {params} = this.props.navigation.state
 		let title = params ? params.id != undefined ? params.id : new Date().getTime() : new Date().getTime()
@@ -243,7 +310,25 @@ class NewFile extends Component {
 		})
 	}
 
+	getLanguageSpeak() {
+		AsyncStorage.getItem('setting_voice', (err, result) => {
+			if (result) {
+				let x = JSON.parse(result)
+				let bahasa = x.bahasa || 'id-ID'
+				this.setState({
+					langDefault : bahasa
+				})
+			} else {
+				this.setState({
+					langDefault : 'id-ID'
+				})
+			}
+		})			
+	}
+
 	componentDidMount() {
+		this.getLanguageSpeak()
+
 		const {params} = this.props.navigation.state
 		this.setState({
 			theTitle : params ? params.title : ''
@@ -262,18 +347,18 @@ class NewFile extends Component {
 			this.setState({
 				theTitle : theTitle
 			})
-		}, 3000)		
+		}, 5000)
 	}
 
 	_keyboardDidShow () {
 		Animated.sequence([
 			Animated.timing(this.state.heightVoice, {
 				toValue : 0,
-				duration : 500
+				duration : 200
 			}),
 			Animated.timing(this.state.opacityVoice, {
 				toValue : 0,
-				duration : 500
+				duration : 200
 			})
 		]).start()
 	}
@@ -282,13 +367,15 @@ class NewFile extends Component {
 		Animated.sequence([
 			Animated.timing(this.state.heightVoice, {
 				toValue : 100,
-				duration : 500
+				duration : 200
 			}),
 			Animated.timing(this.state.opacityVoice, {
 				toValue : 1,
-				duration : 500
+				duration : 200
 			})
 		]).start()
+
+		this.autoSave()
 	}
 
 	async onSpeechStart(e) {
@@ -307,21 +394,27 @@ class NewFile extends Component {
 
 		this.lengtPart = 0
 	}
-
+	
 	async onSpeechEndHandler(e) {
 		this.setState({
 			startedVoice : false,
-			textPartial : ' '
+			textPartial : ' ',
+			alreadyInput : false
+		}, () => {
+			this.lengtPart = 0
 		})
 
-		this.lengtPart = 0
 		// this.richtext.setContentHTML('ok ok ok')
+
+		// SAVE DOCUMENT
+		this.autoSave()
 	}
 
 	async _stopRecognizing(e) {
 		try {
 			this.lengtPart = 0
-		await Voice.stop();
+			// this.autoSave()
+			await Voice.stop();
 		} catch (e) {
 		console.error(e);
 		}
@@ -346,14 +439,29 @@ class NewFile extends Component {
 		// console.log(e.value[0].split(" ").pop())
 
 		let x = e.value[0].split(" ").length
+		// console.log(this.lengtPart, x, e.value[0])
+		let beforeLengthPart = this.lengtPart
 		if (this.lengtPart < x) {
 			this.lengtPart = x
-			let isinya = this.lengtPart == 1 ? e.value[0] : e.value[0].split(" ").pop()
-			this.richtext.prepareInsert()
-			this.richtext.insertNextText( isinya + " ")
+			let isinya = this.lengtPart == 1 ? e.value[0] : e.value[0].split(" ")[x-1]
+			if (beforeLengthPart == this.lengtPart - 1) {
+				if (isinya) {
+					this.richtext.prepareInsert()
+					this.richtext.insertNextText(isinya + " ")
+				}
+			}
+		} else {
+			if (!this.state.alreadyInput) {
+				let isinya = e.value[0]
+				if (isinya) {
+					this.richtext.prepareInsert()
+					this.richtext.insertNextText(isinya + " ")
+					this.setState({
+						alreadyInput : true
+					})
+				}
+			}
 		}
-		// if (lengthSekarang > lengthSebelum) {
-		// }
 	}
 
 	setFocusHandlers() {
@@ -393,7 +501,7 @@ class NewFile extends Component {
 	async startVoice() {
 		// this.richtext.setContentHTML('ini contoh pas di klik')
 		if (!this.state.startedVoice) {
-			Voice.start('id-ID').then(() => {
+			Voice.start(this.state.langDefault).then(() => {
 				this.richtext.setContentFocusHandler(async () => {
 					let content = await this.richtext.getContentHtml()
 					this.setState({
@@ -416,23 +524,30 @@ class NewFile extends Component {
 	}
 
 	insertImage() {
-		let options = {
-			title : 'Pilih Photo',
-			storageOptions : {
-				skipBackup : true,
-				path : 'images'
-			},
-			noData : false
-		}
-		ImagePicker.showImagePicker(options, (response) => {
-			if (response.didCancel) {
-				console.log('User cancelled image picker');
-			}
-			else if (response.error) {
-				console.log('ImagePicker Error: ', response.error);
+		this.richtext.getContentHtml().then((content) => {
+			let totalImage = content.split("<img").length
+			if (parseInt(totalImage/2) < 2) {
+				let options = {
+					title : 'Pilih Photo',
+					storageOptions : {
+						skipBackup : true,
+						path : 'images'
+					},
+					noData : false
+				}
+				ImagePicker.showImagePicker(options, (response) => {
+					if (response.didCancel) {
+						console.log('User cancelled image picker');
+					}
+					else if (response.error) {
+						console.log('ImagePicker Error: ', response.error);
+					} else {
+						let source = {src : response.uri}
+						this.richtext.insertImage(source)
+					}
+				})	
 			} else {
-				let source = {src : response.uri}
-				this.richtext.insertImage(source)
+				alert('Anda Tidak Dapat Menambah Gambar Lagi')
 			}
 		})
 	}
@@ -467,7 +582,7 @@ class NewFile extends Component {
 					<Animated.View style={{opacity : this.state.opacityVoice, height : this.state.heightVoice}}>
 						<Footer style={{height : 100}}>
 							<FooterTab style={{padding : 20, backgroundColor : '#007B70'}}>
-								<Button full style={{padding : 40}} transparent onPress={this.startVoice.bind(this)} accessibilityLabel="Menemu Menulis Dengan Mulut">
+								<Button full style={{padding : 40}} transparent onPress={this.startVoice.bind(this)} accessibilityLabel="Menemu, Menulis Dengan Mulut">
 									<Icon name={this.state.startedVoice == false ? "keyboard-voice" : "settings-voice"} type="MaterialIcons" style={{fontSize : 50, color : '#FFF', margin : 40}}/>
 								</Button>
 							</FooterTab>

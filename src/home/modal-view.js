@@ -8,11 +8,19 @@ import {
 	ScrollView
 } from 'react-native'
 import { Text, Container, Header, Left, Button, Icon, Content } from "native-base";
+
 import {speak, lang, tts} from '../services/speak'
 import HTMLView from 'react-native-htmlview';
 import HtmlView from 'react-native-htmlview';
 import Footer from '../../native-base-theme/components/Footer';
 import Body from '../../native-base-theme/components/Body';
+import firebase from 'react-native-firebase';
+
+// ADMOB
+const Banner = firebase.admob.Banner;
+const AdRequest = firebase.admob.AdRequest;
+const request = new AdRequest()
+request.addKeyword('education')
 
 export default class ModalView extends Component {
 	constructor(props) {
@@ -29,6 +37,8 @@ export default class ModalView extends Component {
 		tts.addEventListener('tts-start', this._ttsStart.bind(this))
 		tts.addEventListener('tts-finish', this._ttsFinish.bind(this))
 		tts.addEventListener('tts-cancel', this._ttsCancel.bind(this))
+
+		this.contentForRead = []
 	}
 
 	componentDidMount() {
@@ -44,18 +54,15 @@ export default class ModalView extends Component {
 	_ttsFinish(e) {
 		if (this.state.speakJudul) {
 			this.setState({
-				speakJudul : false
+				speakJudul : false,
+				speaking : false
 			}, () => {
-				this.setState({
-					speaking : false
-				}, () => {
-					let content = this.props.content.split("<br>")
-					if (content[this.state.counterPart] != '' && content[this.state.counterPart] != null) {
-						this.speakNow(content[this.state.counterPart])
-					} else {
-						ToastAndroid.show('Selesai Membaca Document', ToastAndroid.CENTER)
-					}							
-				})
+				let content = this.props.content.split("<br>")
+				if (content[this.state.counterPart] != '' && content[this.state.counterPart] != null) {
+					this.speakNow(content[this.state.counterPart])
+				} else {
+					ToastAndroid.show('Selesai Membaca Document', ToastAndroid.CENTER)
+				}
 			})
 		} else {
 			let c = !this.state.repeat ? this.state.counterPart + 1 : this.state.counterPart
@@ -64,10 +71,12 @@ export default class ModalView extends Component {
 				speaking : false
 			}, () => {
 				// alert(this.state.content)
-				let content = this.props.content.split("<br>")
-				if (content[this.state.counterPart] != '' && content[this.state.counterPart] != null) {
-					this.speakNow(content[this.state.counterPart])
+				// let content = this.props.content.split("<br>")
+				// if (content[this.state.counterPart] != '' && content[this.state.counterPart] != null) {
+				if (this.contentForRead[this.state.counterPart] != null) {
+					this.speakNow(this.contentForRead[this.state.counterPart])
 				} else {
+					// alert('SELESAI GAES' + this.state.counterPart + " " + this.contentForRead[this.state.counterPart])
 					ToastAndroid.show('Selesai Membaca Document', ToastAndroid.CENTER)
 				}
 			})
@@ -81,6 +90,7 @@ export default class ModalView extends Component {
 	}
 	
 	speakNow(contents) {
+		// alert(this.state.speaking)
 		if (this.state.speaking) {
 			tts.stop()
 		} else {
@@ -99,22 +109,43 @@ export default class ModalView extends Component {
 						speak('Gambar')
 						// alert(contents)
 					}
+				} else {
+					this._ttsFinish()
 				}
 			}
 		}
 	}
 
-	play(counter = 0, play = true) {
+	play(counter = 0, play) {
+		// if (this.contentForRead.length == 0) {
+			this.contentForRead = this.props.content.split("<br>")
+		// }
+		
 		let contents = this.props.content
 		let part = contents.split("<br>")
-		this.setState({
-			counterPart : counter,
-			content : this.props.content,
-			speakJudul : counter == 0
-		}, () => {
-			// tts.stop()
-			this.speakNow(part[this.state.counterPart])
-		})
+		const x = () => {
+			tts.stop()
+			this.setState({
+				counterPart : counter,
+				content : this.props.content,
+				speakJudul : counter == 0
+			}, () => {
+				// tts.stop()
+				this.speakNow(part[this.state.counterPart])
+			})	
+		}
+
+		if (play != null) {
+			// if (this.state.speaking) {
+			// 	counter = this.state.counterPart
+			// }
+			// alert(counter)
+			this.setState({
+				speaking : play
+			}, () => x())
+		} else {
+			x()
+		}
 	}
 
 	renderListText() {
@@ -153,6 +184,17 @@ export default class ModalView extends Component {
 		}
 	}
 	
+	renderAds() {
+		return (
+			<Banner
+				unitId="ca-app-pub-8212267677070874/3286142813"
+				request={request.build()}
+				onAdLoaded={() => {
+					console.log("Ad Loaded")
+				}}
+			/>
+		)
+	}
 	footerRender() {
 		return (
 			<View style={{height : 70, position : 'absolute', bottom : 0, right : 0, left : 0, justifyContent : 'center'}}>
@@ -164,13 +206,13 @@ export default class ModalView extends Component {
 						}} success accessibilityLabel="Tutup Baling">
 							<Icon name="ios-close-circle-outline"/>
 						</Button>
-						<Button style={styles.btnControl} onPress={() => this.play(this.state.counterPart - 1)} success accessibilityLabel="Membaca Kalimat Sebelumnya">
+						<Button style={styles.btnControl} onPress={() => this.play(this.state.counterPart - 1, false)} success accessibilityLabel="Membaca Kalimat Sebelumnya">
 							<Icon name="ios-arrow-dropleft-outline" type="Ionicons"/>
 						</Button>
 						<Button style={styles.btnControl} onPress={() => this.play()} success accessibilityLabel="Berhenti atau Mulai Membaca Dengan Telinga">
 							<Icon name={this.state.speaking ? "ios-pause-outline" : "ios-play-outline"} type="Ionicons"/>
 						</Button>
-						<Button style={styles.btnControl} onPress={() => this.play(this.state.counterPart + 1)} success accessibilityLabel="Membaca Kalimat Selanjutnya">
+						<Button style={styles.btnControl} onPress={() => this.play(this.state.counterPart + 1, false)} success accessibilityLabel="Membaca Kalimat Selanjutnya">
 							<Icon name="ios-arrow-dropright-outline" type="Ionicons"/>
 						</Button>
 						<Button style={styles.btnControl} onPress={() => {
@@ -179,6 +221,7 @@ export default class ModalView extends Component {
 						}} success accessibilityLabel="Mengulang">
 							<Icon name={this.state.repeat ? "ios-more" : "repeat"} type="Ionicons"/>
 						</Button>
+
 					</View>
 				</Container>
 			</View>
@@ -203,10 +246,12 @@ export default class ModalView extends Component {
 								this.play(0)
 							}}
 							style={{backgroundColor : (this.state.counterPart == 0 && this.state.speaking && this.state.speakJudul) ? '#FDE3A7' : '#FFF'}}>
-							<Text style={{marginBottom : 10}}>{this.props.titleDoc}</Text>
+							<Text style={{marginBottom : 10, color : '#666', fontSize : 20}}>{this.props.titleDoc}</Text>
 						</TouchableHighlight>
-						<View style={{height : 1, marginBottom : 20, backgroundColor : '#CCC', flex : 1}}/>
+						<View style={{height : 1, marginBottom : 10, backgroundColor : '#CCC', flex : 1}}/>
+						{this.renderAds()}
 						{this.renderListText()}
+						{this.renderAds()}
 					</ScrollView>
 					{
 						this.footerRender()

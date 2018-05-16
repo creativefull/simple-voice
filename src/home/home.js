@@ -31,6 +31,7 @@ import {
 	ScrollView,
 	ToastAndroid,
 	View,
+	RefreshControl,
 	Alert,
 	Clipboard,
 	Linking,
@@ -41,6 +42,7 @@ import {
 import NewDoc from './newfile'
 import About from './about'
 import Setting from './setting'
+import ImportPage from './import'
 
 class HeaderApp extends Component {
 	render() {
@@ -49,7 +51,11 @@ class HeaderApp extends Component {
 				<Body>
 					<Title>Menemu Baling</Title>
 				</Body>
-				<Right />
+				{/* <Right>
+					<Button transparent accessibilityLabel="Import document bacaan" onPress={() => this.props.navigation.navigate('ImportPage')}>
+						<Icon name="attachment" type="Entypo"/>
+					</Button>
+				</Right> */}
 			</Header>
 		)
 	}
@@ -59,14 +65,15 @@ class Home extends Component {
 	constructor() {
 		super()
 		this.state = {
-			data : []
+			data : [],
+			refreshing : false
 		}
 	}
 
 	floatingButton() {
 		return (
 			<Button success style={{zIndex : 9, width : 70, height : 70, borderRadius : 70, justifyContent : 'center', position : 'absolute', bottom : 10, right : 10, alignItems : 'center'}} onPress={() => this.props.navigation.navigate('NewDoc')} accessibilityLabel="TAMBAH DOCUMENT BARU">
-				<Icon style={{fontSize : 30}} name="plus" type="FontAwesome"/>
+				<Icon accessibilityLabel="TAMBAH DOCUMENT BARU" style={{fontSize : 30}} name="plus" type="FontAwesome"/>
 			</Button>
 		)
 	}
@@ -149,7 +156,7 @@ class Home extends Component {
 	renderNotes() {
 		if (this.state.data.length > 0) {
 			return (
-				this.state.data.map((d, key) => {
+				this.state.data.sort((a, b) => b.time_update - a.time_update).map((d, key) => {
 					return (
 						<TouchableOpacity
 							onPress={() => {
@@ -212,9 +219,13 @@ class Home extends Component {
 		return (
 			<StyleProvider style={getTheme(material)}>
 				<Container>
-					<HeaderApp/>
+					<HeaderApp {...this.props}/>
 
-					<ScrollView>
+					<ScrollView refreshControl={
+						<RefreshControl
+							refreshing={this.state.refreshing}
+							onRefresh={this.getListDocument.bind(this)}/>
+					}>
 						{this.renderNotes()}
 					</ScrollView>
 
@@ -268,9 +279,12 @@ const Nav = StackNavigator({
 	},
 	NewDoc : {
 		screen : NewDoc
+	},
+	ImportPage : {
+		screen : ImportPage
 	}
 }, {
-	initialRouteName : 'Home',
+	initialRouteName : 'ImportPage',
 	headerMode : 'none'
 })
 

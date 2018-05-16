@@ -1,6 +1,6 @@
 import tts from 'react-native-tts'
 import {
-	AsyncStorage	
+	AsyncStorage
 } from 'react-native'
 
 exports.lang = async (l = 'id-ID') => {

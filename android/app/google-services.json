@@ -1,0 +1,73 @@
+{
+  "project_info": {
+    "project_number": "614211414778",
+    "firebase_url": "https://menemubaling.firebaseio.com",
+    "project_id": "menemubaling",
+    "storage_bucket": "menemubaling.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:614211414778:android:e2380aac149a9690",
+        "android_client_info": {
+          "package_name": "com.menemuBaling"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "614211414778-t289lcoo7lo9fefv0d0g7o514ouupt4t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBlTgLYEkz_5S4Lf8u6l1EXnuezxtDVqEs"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:614211414778:android:fbf7ba46e780e442",
+        "android_client_info": {
+          "package_name": "com.menemubaling"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "614211414778-t289lcoo7lo9fefv0d0g7o514ouupt4t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBlTgLYEkz_5S4Lf8u6l1EXnuezxtDVqEs"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

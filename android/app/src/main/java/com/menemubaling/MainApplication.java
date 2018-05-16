@@ -3,8 +3,8 @@ package com.menemubaling;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.filepicker.FilePickerPackage;
 import com.imagepicker.ImagePickerPackage;
-import io.rumors.reactnativesettings.RNSettingsPackage;
 import cl.json.RNSharePackage;
 import net.no_mad.tts.TextToSpeechPackage;
 import com.cmcewen.blurview.BlurViewPackage;
@@ -18,10 +18,15 @@ import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
 import com.wix.reactnativekeyboardinput.KeyboardInputPackage;
+import io.invertase.firebase.RNFirebasePackage;
+import io.invertase.firebase.admob.RNFirebaseAdMobPackage;
 
 import java.util.Arrays;
 import java.util.List;
 import cl.json.ShareApplication;
+
+// CUSTOM NATIVE MODULES
+import com.menemubaling.nativepackage.opensettings.OpenSettingsPackage;
 
 public class MainApplication extends Application implements ShareApplication, ReactApplication {
 
@@ -35,8 +40,8 @@ public class MainApplication extends Application implements ShareApplication, Re
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new FilePickerPackage(),
             new ImagePickerPackage(),
-            new RNSettingsPackage(),
             new RNSharePackage(),
             new TextToSpeechPackage(),
             new BlurViewPackage(),
@@ -45,7 +50,10 @@ public class MainApplication extends Application implements ShareApplication, Re
             new KeyboardInputPackage(MainApplication.this, true),
             new WebViewBridgePackage(),
             new VoicePackage(),
-            new CheckPackageInstallationPackage()
+            new CheckPackageInstallationPackage(),
+            new OpenSettingsPackage(),
+            new RNFirebasePackage(),
+            new RNFirebaseAdMobPackage()
       );
     }
 
